@@ -19,7 +19,7 @@ module ParserBasicTests =
     open NTDLS.Katzebase.Client.Types
     open NTDLS.Katzebase.Client.Exceptions
     open NTDLS.Katzebase.Engine.Library
-
+    open System
     let ``Parse "SELECT * FROM MASTER:ACCOUNT"`` (outputOpt:ITestOutputHelper option) =
         let userParameters = null
         let preparedQueries = StaticQueryParser.ParseBatch(_core, "SELECT * FROM MASTER:ACCOUNT", userParameters.ToUserParametersInsensitiveDictionary())
@@ -47,8 +47,9 @@ module ParserBasicTests =
         let userParameters = new KbInsensitiveDictionary<KbConstant>()
         userParameters.Add("@Username", new KbConstant("testUser", KbConstants.KbBasicDataType.String))
         userParameters.Add("@PasswordHash", new KbConstant("testPassword", KbConstants.KbBasicDataType.String))
-        let preparedQueries = StaticQueryParser.ParseBatch(_core, "SELECT * FROM MASTER:ACCOUNT WHERE Username = @Username AND PasswordHash = @PasswordHash", userParameters)
-
+        let preparedQueries = StaticQueryParser.ParseBatch(_core, "SELECT guid(), * FROM MASTER:ACCOUNT WHERE Username = @Username AND PasswordHash = @PasswordHash", userParameters)
+        let preLogin = _core.Sessions.CreateSession(Guid.NewGuid(), "testUser", "testClient")
+        let queryResultCollection = _core.Query.ExecuteQuery(preLogin, preparedQueries.Item 0)
         equals 1 preparedQueries.Count 
 
         let pq0 = preparedQueries[0]
