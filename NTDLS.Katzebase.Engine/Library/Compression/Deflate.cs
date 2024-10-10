@@ -31,3 +31,5 @@ namespace NTDLS.Katzebase.Engine.Library.Compression
         public static string DecompressToString(byte[] bytes) => Encoding.UTF8.GetString(Decompress(bytes));
     }
 }
+
+

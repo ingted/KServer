@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj": {}
+    "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj": {}
   },
   "projects": {
-    "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj": {
+    "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj": {
       "version": "0.22.0",
       "restore": {
-        "projectUniqueName": "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj",
+        "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj",
         "projectName": "NTDLS.Katzebase.Client.dev",
-        "projectPath": "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj",
+        "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Client\\obj\\",
+        "outputPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Client\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "configFilePaths": [
@@ -212,14 +212,14 @@
         }
       }
     },
-    "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj": {
+    "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj",
+        "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj",
         "projectName": "NTDLS.Katzebase.Parsers.Generic",
-        "projectPath": "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj",
+        "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Parsers.Generic\\obj\\",
+        "outputPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Parsers.Generic\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -237,8 +237,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj": {
-                "projectPath": "G:\\coldfar_py\\NTDLS.Katzebase_generic\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj"
+              "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj": {
+                "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Client\\NTDLS.Katzebase.Client.csproj"
               }
             }
           }
@@ -264,7 +264,7 @@
             },
             "NTDLS.Helpers": {
               "target": "Package",
-              "version": "[1.2.11, )"
+              "version": "[1.3.3, )"
             }
           },
           "imports": [

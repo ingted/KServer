@@ -1,0 +1,9 @@
+# pack-refs with: peeled fully-peeled sorted 
+1b61915f446a17cc393f6d911215a2c00db54dd5 refs/remotes/origin/fsharp-collections
+69844beef54ee57c0ff343272afeb3bc0104ef8b refs/remotes/origin/master
+daed88021a296bdf49acfaf9a407fa0701f950f8 refs/tags/0.0.1
+f5eb38d2c9680d22e7462bc11d9a8004872448c2 refs/tags/0.1.0
+57f9df6998e33c803e7fab79de03fc6dfb665b75 refs/tags/0.1.1
+800e43ccf80e783c051aa9985d3df800a9139671 refs/tags/0.1.2
+31d2082863cee8f1b511763e77cbd9d01ebcc028 refs/tags/0.2.0
+b2cfd9c02ee6138d4d1823363e02329fb2ff76d7 refs/tags/0.2.1

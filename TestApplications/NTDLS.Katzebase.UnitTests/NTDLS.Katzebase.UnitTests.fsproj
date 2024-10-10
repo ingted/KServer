@@ -6,10 +6,10 @@
 		<OutputPath>.\bin</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);COMPARE;GENERIC_TDATA</DefineConstants>
+	  <DefineConstants>$(DefineConstants);COMPARE;GENERIC_TDATA;CELL_STRUCT</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);COMPARE;GENERIC_TDATA</DefineConstants>
+	  <DefineConstants>$(DefineConstants);COMPARE;GENERIC_TDATA;CELL_STRUCT</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -71,6 +71,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <ProjectReference Include="..\..\fstring\fstring.fsproj" />
     <ProjectReference Include="..\..\NTDLS.Katzebase.Client\NTDLS.Katzebase.Client.csproj" />
     <ProjectReference Include="..\..\NTDLS.Katzebase.Engine\NTDLS.Katzebase.Engine.csproj" />
     <ProjectReference Include="..\..\NTDLS.Katzebase.Server\NTDLS.Katzebase.Server.csproj" />

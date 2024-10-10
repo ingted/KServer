@@ -1,2 +1,0 @@
-EXEC ClearCacheAllocations
-ANALYZE SCHEMA Benchmarking:Payload_10000 with (IncludePhysicalPages = true)

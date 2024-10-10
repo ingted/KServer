@@ -7,7 +7,9 @@
 #endif
 
 #if GENERIC_TDATA
-
+#if CELL_STRUCT
+open fs
+#endif
 #else
 open NTDLS.Katzebase.Client.Payloads
 #endif

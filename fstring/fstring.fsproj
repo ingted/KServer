@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <Compile Include="Compression.fsx" />
+      <Compile Include="PB.fsx" />
+  </ItemGroup>
+
+  <ItemGroup />
+
+  <ItemGroup>
+    <ProjectReference Include="..\NTDLS.Katzebase.Parsers.Generic\NTDLS.Katzebase.Parsers.Generic.csproj" />
+    <ProjectReference Include="..\protobuf-net-fsharp\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" />
+  </ItemGroup>
+
+</Project>

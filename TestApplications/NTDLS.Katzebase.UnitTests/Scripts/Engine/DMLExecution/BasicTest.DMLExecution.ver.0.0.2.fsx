@@ -1,5 +1,5 @@
 #if INTERACTIVE
-#load "../../UnitTestsSharedResource.ver.0.0.1.fsx"
+#load "../../UnitTestsSharedResource.ver.0.0.2.fsx"
 #load "../../Tests.ver.0.0.1.fsx"
 #r "nuget: DecimalMath.DecimalEx, 1.0.2"
 #r "nuget: Xunit"
@@ -14,13 +14,18 @@ open System
 open System.Collections.Generic
 open NTDLS.Katzebase.Engine
 
+
 module DMLExecutionBasicTests =
     open NTDLS.Katzebase.Parsers
     open NTDLS.Katzebase.Parsers.Query    
     open NTDLS.Katzebase.Parsers.Query.Fields    
     open NTDLS.Katzebase.Client.Types
     open NTDLS.Katzebase.Engine.QueryProcessing
-
+#if GENERIC_TDATA
+#if CELL_STRUCT
+    open fs
+#endif
+#endif
     type ExprProc = StaticScalerExpressionProcessor
 
     type TwoColumnString () =

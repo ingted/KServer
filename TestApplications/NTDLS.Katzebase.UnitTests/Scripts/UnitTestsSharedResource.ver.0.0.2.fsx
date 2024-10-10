@@ -9,13 +9,9 @@ Please remeber to add --define:GENERIC_TDATA to F# fsi when doing generic versio
 #r @"nuget: Newtonsoft.Json, 13.0.3"
 #r @"nuget: NTDLS.DelegateThreadPooling, 1.4.8"
 #r @"nuget: NTDLS.FastMemoryCache, 1.7.5"
-#r @"nuget: NTDLS.Helpers, Version=1.2.11"
-//#r @"nuget: NTDLS.Katzebase.Client, 1.7.8"
-//#r @"nuget: NTDLS.Katzebase.Client.dev, 1.7.8.1"
-//#r @"G:\coldfar_py\NTDLS.Katzebase.Client\bin\Debug\net8.0\NTDLS.Katzebase.Client.dll"
-
+#r @"nuget: NTDLS.Helpers, 1.3.3"
+#r "nuget: NCalc"
 #r @"nuget: Serilog, 4.0.1"
-#r @"nuget: NTDLS.Helpers, 1.2.9.0"
 #r @"nuget: NTDLS.ReliableMessaging, 1.10.9.0"
 #r @"nuget: protobuf-net"
 #r @"../../../NTDLS.Katzebase.Shared/bin/Debug/net8.0/NTDLS.Katzebase.Shared.dll"
@@ -23,6 +19,11 @@ Please remeber to add --define:GENERIC_TDATA to F# fsi when doing generic versio
 #r @"../../../NTDLS.Katzebase.Engine/bin/Debug/net8.0/NTDLS.Katzebase.Client.dll"
 #if GENERIC_TDATA
 #r @"../../../NTDLS.Katzebase.Engine/bin/Debug/net8.0/NTDLS.Katzebase.Parsers.Generic.dll"
+#if CELL_STRUCT
+//#r @"../../../NTDLS.Katzebase.Engine/bin/Debug/net8.0/fstring.dll"
+#r @"G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\fstring.dll"
+#r @"../../../NTDLS.Katzebase.Engine/bin/Debug/net8.0/protobuf-net-fsharp.dll"
+#endif
 #else
 #r @"../../../NTDLS.Katzebase.Engine/bin/Debug/net8.0/NTDLS.Katzebase.Parsers.dll"
 #endif
@@ -62,6 +63,28 @@ createIfDirNotExisted settings.LogDirectory
 createIfDirNotExisted $"{settings.DataRootPath}/single"
 
 #if GENERIC_TDATA
+
+
+#if CELL_STRUCT
+open System.Collections.Generic
+open fs
+type fstringComparer () =
+    interface IEqualityComparer<fstring> with
+        member this.Equals(x: fstring, y: fstring) =
+            if obj.ReferenceEquals(x, y) then true
+            elif obj.ReferenceEquals(x, null) || obj.ReferenceEquals(y, null) then false
+            else fstring.Compare(x, y) = 0
+
+        member this.GetHashCode(obj: fstring) =
+            match obj with
+            | _ when box obj = null -> 0
+            | S s -> s.GetHashCode()
+            | D d -> d.GetHashCode()
+            | A a -> a |> Array.fold (fun acc elem -> acc + elem.GetHashCode()) 0
+            | T (key, f) -> key.GetHashCode() + f.GetHashCode()
+
+#else
+
 [<ProtoContract>]
 type fstring (s) =
     [<ProtoMember(1)>]
@@ -99,6 +122,10 @@ type fstring (s) =
     new () =
         fstring (null)
 
+open ProtoBuf.FSharp
+
+//fs.PB.pbModel <- fs.PB.pbModel |> Serialiser.registerUnionIntoModel<fstring> 
+
 open System.Collections.Generic
 
 type fstringComparer () =
@@ -112,7 +139,7 @@ type fstringComparer () =
             if box obj = null then 0
             else obj.Value.GetHashCode()
 
-
+#endif
 #endif
 
 let inline getValue<'S, 'T when 'S : (member Value : 'T)> (v:'S) =
@@ -167,11 +194,32 @@ type QueryFieldConstantString<'T
 let _core = 
     new EngineCore<fstring>(
         settings
-        , Func<string, fstring>(fun s -> fstring(s))
-        , Func<string, fstring>(fun s -> fstring(s))
-        , Func<fstring, fstring, int> (fun s1 s2 -> String.Compare(s1.Value, s2.Value))
+        , Func<string, fstring>(fun s -> 
+#if CELL_STRUCT
+            S s
+#else
+            fstring(s)
+#endif
+            )
+        , Func<string, fstring>(fun s -> 
+#if CELL_STRUCT
+            S s
+#else
+            fstring(s)
+#endif
+            )
+        , Func<fstring, fstring, int> (fun s1 s2 -> 
+#if CELL_STRUCT
+            fstring.Compare(s1, s2)
+#else
+            String.Compare(s1.Value, s2.Value)
+#endif
+            )
         , fstringComparer ()
         )
+
+
+
 let preLogin = _core.Sessions.CreateSession(Guid.NewGuid(), "testUser", "testClient")
 open NTDLS.Katzebase.Engine.Sessions
 let accounts = _core.Query.ExecuteQuery<Account<fstring>>(preLogin, $"SELECT Username, PasswordHash FROM Master:Account")
@@ -198,9 +246,13 @@ type QueryFieldConstantString with
 
 let testSchemaDDL = "testSchDDL"
 let testSchemaDML = "testSchDML"
+let testSchemaIO  = "testSchIO"
 
 _core.Query.ExecuteNonQuery(preLogin, $"DROP SCHEMA {testSchemaDDL}")
 _core.Query.ExecuteNonQuery(preLogin, $"CREATE SCHEMA {testSchemaDDL}")
 
 _core.Query.ExecuteNonQuery(preLogin, $"DROP SCHEMA {testSchemaDML}")
 _core.Query.ExecuteNonQuery(preLogin, $"CREATE SCHEMA {testSchemaDML}")
+
+//_core.Query.ExecuteNonQuery(preLogin, $"DROP SCHEMA {testSchemaIO}")
+//_core.Query.ExecuteNonQuery(preLogin, $"CREATE SCHEMA {testSchemaIO}")
