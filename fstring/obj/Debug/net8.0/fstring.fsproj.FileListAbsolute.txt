@@ -2,9 +2,13 @@ G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\fstring.deps.js
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\fstring.dll
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\fstring.pdb
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\fstring.xml
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\NTDLS.Katzebase.Client.dll
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\NTDLS.Katzebase.Parsers.Generic.dll
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\protobuf-net-fsharp.dll
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\NTDLS.Katzebase.Parsers.Generic.pdb
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\protobuf-net-fsharp.pdb
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\protobuf-net-fsharp.dll.config
+G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\NTDLS.Katzebase.Client.pdb
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net8.0\fstring.fsproj.AssemblyReference.cache
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net8.0\fstring.AssemblyInfoInputs.cache
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net8.0\fstring.AssemblyInfo.fs
@@ -16,7 +20,3 @@ G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net8.0\refint\fstring.
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net8.0\fstring.xml
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net8.0\fstring.pdb
 G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\obj\Debug\net8.0\ref\fstring.dll
-G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\NTDLS.Katzebase.Client.dll
-G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\NTDLS.Katzebase.Parsers.Generic.dll
-G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\NTDLS.Katzebase.Parsers.Generic.pdb
-G:\coldfar_py\sharftrade9\Libs5\KServer\fstring\bin\Debug\net8.0\NTDLS.Katzebase.Client.pdb

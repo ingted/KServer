@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -9,8 +9,6 @@
 	  <Compile Include="Compression.fsx" />
       <Compile Include="PB.fsx" />
   </ItemGroup>
-
-  <ItemGroup />
 
   <ItemGroup>
     <ProjectReference Include="..\NTDLS.Katzebase.Parsers.Generic\NTDLS.Katzebase.Parsers.Generic.csproj" />
