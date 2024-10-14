@@ -177,7 +177,7 @@ type fstring =
 
 
 type fsk = fstring
-type fsv = Option<fstring>
+type fsv = fstring
 
     //new () =
     //    S null
@@ -474,16 +474,25 @@ module CSL =
         member this.WaitIgnore = this.Result |> ignore
        
 
+    let rec getTypeName (t: Type) =
+        if t.IsGenericType then
+            let genericArgs = t.GetGenericArguments() |> Array.map getTypeName |> String.concat ", "
+            sprintf "%s<%s>" (t.Name.Substring(0, t.Name.IndexOf('`'))) genericArgs
+        else
+            t.Name
+
     type ConcurrentSortedList<'Key, 'Value, 'OpResult 
         when 'Key : comparison
         and 'Value: comparison
         >(
-        outFun:OpResult<'Key, 'Value> -> 'OpResult
-        , extractFun:'OpResult -> OpResult<'Key, 'Value>
-        ) =
+        slId:string
+        , outFun:ConcurrentSortedList<'Key, 'Value, 'OpResult> -> OpResult<'Key, 'Value> -> 'OpResult
+        , extractFunBase:ConcurrentSortedList<'Key, 'Value, 'OpResult> -> 'OpResult -> OpResult<'Key, 'Value>
+        ) as this =
         let sortedList = SortedList<'Key, 'Value>()
         let lockObj = obj()
         let opQueue = ConcurrentQueue<Task<'OpResult>>() // 操作任务队列
+        let extractFun = extractFunBase this
 
         /// 运行队列中的任务
         let rec run () =
@@ -494,6 +503,8 @@ module CSL =
                     do! run ()
                 | false, _ -> ()
             }
+
+        member this.id = slId
 
         member this.Run () =
             lock lockObj (fun () ->
@@ -534,7 +545,7 @@ module CSL =
         /// 封装操作并添加到任务队列，执行后返回 Task
         member this.LockableOp (op: Op<'Key, 'Value>) =
             let taskToEnqueue = 
-                printfn "Current Op: %A" op
+                printfn "Current Op: %A, %s, %s" op (getTypeName typeof<'Key>) (getTypeName typeof<'Value>)
                 match op with
                 | CAdd (k, v) ->
                     fun () ->
@@ -570,7 +581,7 @@ module CSL =
                 | CContains k ->
                     fun () ->
                         sortedList.ContainsKey k |> CBool
-                >> outFun
+                >> (outFun this)
                 |> createTask
             
             // 将操作添加到队列并运行队列
@@ -1010,11 +1021,11 @@ module PCSL =
         , oFun, eFun
         ) =
         let js = JsonSerializer()
-        let sortedList = PCSL<'Key, 'Value>(oFun, eFun)
-        let sortedListStatus = PCSL<'Key, 'Value>(oFun, eFun)
-        let sortedListPersistenceStatus = PCSL<'Key, 'Value>(oFun, eFun)
-        let sortedListIndexReversed = PCSL<'Key, 'Value>(oFun, eFun)
-        let sortedListIndex         = PCSL<'Key, 'Value>(oFun, eFun)
+        let sortedList = PCSL<'Key, 'Value>("sl", oFun, eFun)
+        let sortedListStatus = PCSL<'Key, 'Value>("slSts", oFun, eFun)
+        let sortedListPersistenceStatus = PCSL<'Key, 'Value>("slps", oFun, eFun)
+        let sortedListIndexReversed = PCSL<'Key, 'Value>("slIdxR", oFun, eFun)
+        let sortedListIndex         = PCSL<'Key, 'Value>("slIdx", oFun, eFun)
 
         let schemaPath = Path.Combine(basePath, schemaName)
         let keysPath = Path.Combine(basePath, schemaName, "__keys__")
@@ -1187,6 +1198,11 @@ module PCSL =
             }
         // 其他成员可以根据需要进行扩展，比如 Count、Remove 等
 
+        member this._base = sortedList
+        member this._idx = sortedListIndex
+        member this._idxR = sortedListIndexReversed
+        member this._status = sortedListPersistenceStatus
+
 module PTEST = 
 
     #if INTERACTIVE
@@ -1225,7 +1241,7 @@ module PTEST =
         static let kht = typeof<KeyHash>
         static let pst = typeof<SortedListPersistenceStatus>
 
-        static member oFun (opResult: OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>):PCSLTaskTyp<'Key, 'Value> = 
+        static member oFun (_this: ConcurrentSortedList<'Key, 'Value, 'OpResult>) (opResult: OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>):PCSLTaskTyp<'Key, 'Value> = 
             match opResult with
             | CUnit -> 
                 match typeof<'Key> with
@@ -1411,12 +1427,14 @@ module PTEST =
     //type fsk = fstring
     //type fsv = Option<fstring>
 
-    let pcsl = PersistedConcurrentSortedList<fsk, fsv>(
+    let pcsl = PersistedConcurrentSortedList<string, fsv>(
         20, @"c:\pcsl", "test"
-        , PCSLFunHelper<fsk, fsv>.oFun
-        , PCSLFunHelper<fsk, fsv>.eFun)
+        , PCSLFunHelper<string, fsv>.oFun
+        , PCSLFunHelper<string, fsv>.eFun)
 
 
-    pcsl.TryGetValue (S "ORZ")
+    pcsl.TryGetValue ("ORZ")
 
-    pcsl.Add (S "ORZ", Some (A [| S "GG"|]), 3000)
+    pcsl.Add ("ORZ", (A [| S "GG"|]), 3000)
+
+    pcsl._base
