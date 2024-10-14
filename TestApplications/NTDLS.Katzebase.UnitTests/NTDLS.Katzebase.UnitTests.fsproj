@@ -21,6 +21,10 @@
 		<Compile Include="Scripts/UnitTestsSharedResource.ver.0.0.2.fsx">
 			<Link>Shared/UnitTestsSharedResource.fsx</Link>
 		</Compile>
+		
+		<Compile Include="Scripts/fstring.tests.ver.0.0.1.fsx">
+			<Link>Shared/fstring.tests.ver.0.0.1.fsx</Link>
+		</Compile>
 
 		<Compile Include="Scripts/Tests.ver.0.0.1.fsx">
 			<Link>Shared/Tests.fsx</Link>

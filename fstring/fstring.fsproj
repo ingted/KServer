@@ -1,18 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
 	  <Compile Include="Compression.fsx" />
+	  <None Include="PB 20241014.before_change.fsx" />
+	  <None Include="PB 20241014.fsx" />
       <Compile Include="PB.fsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NTDLS.Katzebase.Parsers.Generic\NTDLS.Katzebase.Parsers.Generic.csproj" />
     <ProjectReference Include="..\protobuf-net-fsharp\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="FAkka.FsPickler">
+      <Version>9.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="FAkka.FsPickler.Json">
+      <Version>9.0.3</Version>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
