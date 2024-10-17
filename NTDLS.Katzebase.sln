@@ -47,6 +47,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "ProtoBuf.FSharp", "protobuf
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "fstring", "fstring\fstring.fsproj", "{0DE57A0D-F8D3-4423-874D-C227E360002D}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fstringTest", "fstringTest\fstringTest.fsproj", "{92822701-5F37-41C7-8831-43BB1243443D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{0DE57A0D-F8D3-4423-874D-C227E360002D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DE57A0D-F8D3-4423-874D-C227E360002D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DE57A0D-F8D3-4423-874D-C227E360002D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92822701-5F37-41C7-8831-43BB1243443D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92822701-5F37-41C7-8831-43BB1243443D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92822701-5F37-41C7-8831-43BB1243443D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92822701-5F37-41C7-8831-43BB1243443D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +119,7 @@ Global
 		{AB59190F-D1BF-46E7-98F0-F4E29C48B738} = {7ADB6C27-7022-46C9-A0BD-FF2667492931}
 		{8CBD24DC-D19B-486E-8B76-1F5A9F44CC0C} = {7ADB6C27-7022-46C9-A0BD-FF2667492931}
 		{0DE57A0D-F8D3-4423-874D-C227E360002D} = {7ADB6C27-7022-46C9-A0BD-FF2667492931}
+		{92822701-5F37-41C7-8831-43BB1243443D} = {08463189-3AA6-472B-8116-584F09A0A305}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {16ADDA6D-28A3-4730-94D0-61E6D3E723B0}

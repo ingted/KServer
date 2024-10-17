@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © 2024 NetworkDLS")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.22.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.22.0+2a8fe9665875128a4833143e053f7c76bbc3701e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.22.0+602405ecc409819a246ed0ec75d1d85e8a460f0f")]
 [assembly: System.Reflection.AssemblyProductAttribute("NTDLS.Katzebase.Management")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NTDLS.Katzebase.Management")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.22.0.0")]

@@ -233,6 +233,7 @@ module PB =
     open ProtoBuf.Meta
     open ProtoBuf.FSharp
     let mutable pbModel = //lazy (
+
         printfn "???????????????????????????????????????????????????????????????"
         RuntimeTypeModel.Create("???")
         |> Serialiser.registerUnionIntoModel<fstring> 
@@ -299,11 +300,15 @@ module PB2 =
             with get, set
 
         static member serializeFBase (m, (ms, o)) =
+#if DEBUG1
             printfn "[serializeF] type: %s, %A" (o.GetType().Name) o
+#endif
             Serialiser.serialise m ms o
 
         static member deserializeFBase (m, ms) =
+#if DEBUG1
             printfn "[deserializeF] 'T: %s" typeof<'T>.Name
+#endif
             Serialiser.deserialiseConcreteType<'T> m ms
 
         static member serializeF (ms, o) = 
@@ -481,39 +486,64 @@ module CSL =
         else
             t.Name
 
-    type ConcurrentSortedList<'Key, 'Value, 'OpResult 
+    type SLId = string
+
+    type FActor<'T> = MailboxProcessor<'T>
+
+    type QueueProcessor<'T, 'OpResult>(slId: 'T) =
+
+        // 定義一個 MailboxProcessor 來處理操作任務
+        let opProcessor = FActor.Start(fun (inbox:FActor<Task<'OpResult>>) ->
+            let rec loop () =
+                async {
+                    let! task = inbox.Receive()
+    #if DEBUG
+                    printfn "[%A] dequeued %A" slId task
+    #endif
+                    let! tr = task |> Async.AwaitTask |> Async.Catch // 同步執行任務
+
+                    match tr with
+                    | Choice1Of2 s -> printfn "Successfully: %A" s
+                    | Choice2Of2 exn -> printfn "Failed: %A" exn.Message
+                    return! loop() // 繼續處理下一個任務
+
+                }
+            loop()
+        )
+
+        // 提供給外部調用來向 MailboxProcessor 投遞任務
+        member this.Enqueue (task: Task<'OpResult>) =
+            opProcessor.Post task
+
+        // ID 屬性
+        member this.id = slId
+
+
+
+
+    type ConcurrentSortedList<'Key, 'Value, 'OpResult, 'ID
         when 'Key : comparison
         and 'Value: comparison
+        
         >(
-        slId:string
-        , outFun:ConcurrentSortedList<'Key, 'Value, 'OpResult> -> OpResult<'Key, 'Value> -> 'OpResult
-        , extractFunBase:ConcurrentSortedList<'Key, 'Value, 'OpResult> -> 'OpResult -> OpResult<'Key, 'Value>
-        ) as this =
+        slId:'ID
+        , outFun: 'ID -> OpResult<'Key, 'Value> -> 'OpResult
+        , extractFunBase:'ID -> 'OpResult -> OpResult<'Key, 'Value>
+        ) =
         let sortedList = SortedList<'Key, 'Value>()
         let lockObj = obj()
-        let opQueue = ConcurrentQueue<Task<'OpResult>>() // 操作任务队列
-        let extractFun = extractFunBase this
-
-        /// 运行队列中的任务
-        let rec run () =
-            async {
-                match opQueue.TryDequeue() with
-                | true, t -> 
-                    t.RunSynchronously()  // 同步执行任务
-                    do! run ()
-                | false, _ -> ()
-            }
+        let opQueue = QueueProcessor<'ID, 'OpResult>(slId)
+        let extractFun = extractFunBase slId
 
         member this.id = slId
 
-        member this.Run () =
-            lock lockObj (fun () ->
-                run () |> Async.Start
-            )
+
         /// 基础的 Add 操作（直接修改内部数据结构）
         member this.AddBase(key: 'Key, value: 'Value) =
             //sortedList.Add(key, value)
-            sortedList.TryAdd(key, value)
+            let added = sortedList.TryAdd(key, value)
+            printfn "[%A] %A, %A added" slId key value
+            added
 
         /// 基础的 Remove 操作
         member this.RemoveBase(key: 'Key) =
@@ -544,8 +574,11 @@ module CSL =
 
         /// 封装操作并添加到任务队列，执行后返回 Task
         member this.LockableOp (op: Op<'Key, 'Value>) =
+            
             let taskToEnqueue = 
-                printfn "Current Op: %A, %s, %s" op (getTypeName typeof<'Key>) (getTypeName typeof<'Value>)
+#if DEBUG1
+                printfn "%A Current Op: %A, %s, %s" slId op (getTypeName typeof<'Key>) (getTypeName typeof<'Value>)
+#endif
                 match op with
                 | CAdd (k, v) ->
                     fun () ->
@@ -581,12 +614,13 @@ module CSL =
                 | CContains k ->
                     fun () ->
                         sortedList.ContainsKey k |> CBool
-                >> (outFun this)
+                >> (outFun slId)
                 |> createTask
-            
+#if DEBUG1
+            printfn "Enqueuing op %A" op
+#endif
             // 将操作添加到队列并运行队列
             opQueue.Enqueue taskToEnqueue
-            this.Run ()
 
             taskToEnqueue
 
@@ -617,16 +651,22 @@ module CSL =
 
 
         member this.TryGetValue(key: 'Key) =
+#if DEBUG1            
             printfn "TryGetValue"
+#endif
             this.LockableOp(CGet key)
 
         member this.TryGetValueSafe(key: 'Key) : bool * 'Value option =
+#if DEBUG1
             printfn "TryGetValueSafe"
+#endif
             let (COptionValue r) = this.TryGetValue(key).Result |> extractFun
             r
 
         member this.TryGetValueSafeTo(key: 'Key, _toMilli:int) : bool * 'Value option =
+#if DEBUG1
             printfn "TryGetValueSafeTo"
+#endif
             try
                 let (COptionValue r) = this.TryGetValue(key).WaitAsync(_toMilli).Result |> extractFun
                 r
@@ -702,6 +742,8 @@ module CSL =
         member this.ContainsKeySafe (k:'Key) =
             let (CBool r) = this.ContainsKey(k).Result |> extractFun
             r
+
+        member this._base = sortedList
 //#if ORZ
 
 module PCSL =
@@ -927,7 +969,9 @@ module PCSL =
         
                 if completedTask = timeoutTask then
                     // 超时
+#if DEBUG1
                     printfn "Task timed out."
+#endif
                     return Choice2Of3 (new TimeoutException ())
                 else
                     // 任务已完成
@@ -981,7 +1025,9 @@ module PCSL =
             | :? TimeoutException as te ->
                 Choice2Of3 te
             | :? AggregateException as ae ->
+#if DEBUG1
                 printfn "aeaeaeaeaeae: %A" ae
+#endif
                 Choice3Of3 ae
             | exn ->
                 reraise ()
@@ -1008,12 +1054,15 @@ module PCSL =
 
         
 
-    type PCSL<'Key, 'Value 
+    type PCSL<'Key, 'Value, 'ID
         when 'Key : comparison
         and 'Value: comparison
-        > = ConcurrentSortedList<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>, PCSLTaskTyp<'Key, 'Value>>
+        > = ConcurrentSortedList<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>, PCSLTaskTyp<'Key, 'Value>, 'ID>
 
-    type PersistedConcurrentSortedList<'Key, 'Value 
+    type SLTyp =
+    | TSL | TSLSts | TSLPSts | TSLIdx | TSLIdxR
+
+    type PersistedConcurrentSortedList<'Key, 'Value
         when 'Key : comparison
         and 'Value: comparison
         >(
@@ -1021,11 +1070,11 @@ module PCSL =
         , oFun, eFun
         ) =
         let js = JsonSerializer()
-        let sortedList = PCSL<'Key, 'Value>("sl", oFun, eFun)
-        let sortedListStatus = PCSL<'Key, 'Value>("slSts", oFun, eFun)
-        let sortedListPersistenceStatus = PCSL<'Key, 'Value>("slps", oFun, eFun)
-        let sortedListIndexReversed = PCSL<'Key, 'Value>("slIdxR", oFun, eFun)
-        let sortedListIndex         = PCSL<'Key, 'Value>("slIdx", oFun, eFun)
+        let sortedList = PCSL<'Key, 'Value, SLTyp>(TSL, oFun, eFun)
+        let sortedListStatus = PCSL<'Key, 'Value, SLTyp>(TSLSts, oFun, eFun)
+        let sortedListPersistenceStatus = PCSL<'Key, 'Value, SLTyp>(TSLPSts, oFun, eFun)
+        let sortedListIndexReversed = PCSL<'Key, 'Value, SLTyp>(TSLIdxR, oFun, eFun)
+        let sortedListIndex         = PCSL<'Key, 'Value, SLTyp>(TSLIdx, oFun, eFun)
 
         let schemaPath = Path.Combine(basePath, schemaName)
         let keysPath = Path.Combine(basePath, schemaName, "__keys__")
@@ -1045,23 +1094,32 @@ module PCSL =
             |] |> Task.WaitAll
             let di = DirectoryInfo keysPath
             di.GetFiles()
+#if ASYNC
             |> PSeq.ordered
             |> PSeq.withDegreeOfParallelism maxDoP
-            |> PSeq.iter (fun fi ->
-                let key = js.UnPickleOfString<'Key> (File.ReadAllText fi.FullName)
-                let baseName = fi.Name.Replace(".index", "")
-                let idx = sortedListIndex.Add(SLK key, SLKH baseName)
-                let idxR = sortedListIndexReversed.Add(SLKH baseName, SLK key)
-                let ps = sortedListPersistenceStatus.Add(SLK key, SLPS NonBuffered)
-                let ts = 
-                    [|
-                        idx.thisT //索引跟 key 必須是一致的
-                        idxR.thisT //索引跟 key 必須是一致的
-                        ps.thisT
-                    |]
-                    |> Task.WaitAllWithTimeout 30000
-                let (Choice1Of3 _) = ts
-                ()
+            |> PSeq.iter (
+#else
+            |> Seq.iter (
+#endif
+                fun fi ->
+                    let key = js.UnPickleOfString<'Key> (File.ReadAllText fi.FullName)
+                    let baseName = fi.Name.Replace(".index", "")
+                    let idx = sortedListIndex.Add(SLK key, SLKH baseName)
+                    let idxR = sortedListIndexReversed.Add(SLKH baseName, SLK key)
+                    let ps = sortedListPersistenceStatus.Add(SLK key, SLPS NonBuffered)
+                    let ts = 
+                        [|
+                            idx.thisT //索引跟 key 必須是一致的
+                            idxR.thisT //索引跟 key 必須是一致的
+                            ps.thisT
+                        |]
+                        |> Task.WaitAllWithTimeout 30000
+                    try
+                        let (Choice1Of3 _) = ts
+                        ()
+                    with
+                    | exn ->
+                        printfn "indexInitialization failed for %s %s" fi.FullName exn.Message
             )
 
 
@@ -1077,11 +1135,15 @@ module PCSL =
             ModelContainer<'Key>.getHashStr key
 
         let getOrNewKeyHash (key: 'Key) =
+#if DEBUG1
             printfn "Query Idx"
-            sortedListIndex.TryGetValueSafeTo(SLK key, 100)
+#endif
+            sortedListIndex.TryGetValueSafeTo(SLK key, 1000)
 
         let getOrNewAndPersistKeyHash (key: 'Key) : KeyHash =
+#if DEBUG1
             printfn "getOrNewAndPersistKeyHash getOrNewKeyHash"
+#endif
             let kh = 
                 match getOrNewKeyHash key with
                 | true, (Some k) -> k
@@ -1099,7 +1161,9 @@ module PCSL =
             |> Task.WaitAllWithTimeout 30000
             //|> Task.RunSynchronously
             |> fun c ->
+#if DEBUG1
                 printfn "ccccccccccc: %A" c
+#endif
                 c
             |> fun (Choice1Of3 success) -> ()
             kh.slkHash
@@ -1134,7 +1198,9 @@ module PCSL =
         
         let readFromFileBase (key: 'Key) : KeyHash option * bool * 'Value option =
             //從 sortedListIndex 
+#if DEBUG1
             printfn "readFromFileBase getOrNewKeyHash"
+#endif
             match getOrNewKeyHash key with
             | true, (Some keyHash) ->
                 let kh = keyHash.slkHash
@@ -1155,16 +1221,31 @@ module PCSL =
                 sortedList.Add(SLK key, SLV valueOpt.Value).Ignore()
                 valueOpt
 
+        member this.GenerateKeyHash = generateKeyHash
+        member this.GetOrNewKeyHash = getOrNewKeyHash
+        member this.GetOrNewAndPersistKeyHash = getOrNewAndPersistKeyHash
+        member this.PersistKeyValueNoRemove = persistKeyValueNoRemove
+        ///persist 之後移出 buffer (不涉及寫入 base sortedList)
+        member this.PersistKeyValueRemove = persistKeyValueRemove
+        
+        ///persist 之後留在 buffer (不涉及寫入 base sortedList)
+        member this.PersistKeyValues = persistKeyValues
+
         member this.Initialized = initialized
         // 添加 key-value 对
         member this.AddAsync(key: 'Key, value: 'Value) =
+#if DEBUG1
+#else
             lock sortedList (fun () ->
+#endif
             [|
                 sortedList.Add(SLK key, SLV value)
                 persistKeyValueNoRemove(key,  value)
             |]
-                
+#if DEBUG1
+#else                
             )
+#endif
         member this.Add(key: 'Key, value: 'Value, _toMilli:int) =
             Task.WaitAll(
                 this.AddAsync(key, value) |> Array.map (fun t -> t.thisT)
@@ -1180,7 +1261,9 @@ module PCSL =
         // 获取 value，如果 ConcurrentSortedList 中不存在则从文件系统中读取
         member this.TryGetValue(key: 'Key) = //: bool * 'Value option =
             lock sortedList (fun () ->
+#if DEBUG1
                 printfn "Query KV"
+#endif
                 let exists, value = sortedList.TryGetValueSafe(SLK key)
                 if exists then
                     let (Some (SLV v)) = value
@@ -1192,16 +1275,22 @@ module PCSL =
                     | None -> false, None
             )
 
+        member this.Item
+            with get(key: 'Key) =
+                (this.TryGetValue(key) |> snd).Value
+            and set(k: 'Key) (v: 'Value) =
+                failwith "upsert not yet implemented"
+
         member this.TryGetValueAsync(key: 'Key) : Task<bool * 'Value option> =
             task {
                 return this.TryGetValue(key)
             }
         // 其他成员可以根据需要进行扩展，比如 Count、Remove 等
 
-        member this._base = sortedList
-        member this._idx = sortedListIndex
-        member this._idxR = sortedListIndexReversed
-        member this._status = sortedListPersistenceStatus
+        member val _base = sortedList                       with get
+        member val _idx = sortedListIndex                   with get
+        member val _idxR = sortedListIndexReversed          with get
+        member val _status = sortedListPersistenceStatus    with get
 
 module PTEST = 
 
@@ -1234,109 +1323,132 @@ module PTEST =
     open PCSL
     open System.Collections.Generic
 
+    type PFCFSLFunHelper<'Key, 'Value when 'Key: comparison and 'Value: comparison> =
+        //static let kvkt = typeof<'Key>
+        //static let kvvt = typeof<'Value>
+        //static let kht = typeof<KeyHash>
+        //static let pst = typeof<SortedListPersistenceStatus>
 
-    type PCSLFunHelper<'Key, 'Value when 'Key: comparison and 'Value: comparison> =
-        static let kvkt = typeof<'Key>
-        static let kvvt = typeof<'Value>
-        static let kht = typeof<KeyHash>
-        static let pst = typeof<SortedListPersistenceStatus>
 
-        static member oFun (_this: ConcurrentSortedList<'Key, 'Value, 'OpResult>) (opResult: OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>):PCSLTaskTyp<'Key, 'Value> = 
+
+        static member oFun (id: SLTyp) (opResult: OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>>):PCSLTaskTyp<'Key, 'Value> = 
+#if DEBUG1
+            printfn $"SLId: {id}: oFun"
+#endif
             match opResult with
             | CUnit -> 
-                match typeof<'Key> with
-                | t when t = kvkt -> KV CUnit
-                | t when t = kht -> Idx CUnit
-                | t when t = pst -> PS CUnit
-                | t when t = kvvt -> failwith "CUnit does not support Value type."
+                match id with
+                | TSLIdxR -> IdxR CUnit
+                | TSLIdx  -> Idx  CUnit
+                | TSLPSts -> PS   CUnit
+                | TSL     -> KV   CUnit
                 | _ -> failwith "Unsupported type in CUnit"
 
             | CAdded added -> 
-                match typeof<'Key> with
-                | t when t = kvkt -> KV (CAdded added)
-                | t when t = kht -> Idx (CAdded added)
-                | t when t = pst -> PS (CAdded added)
-                | t when t = kvvt -> failwith "CAdded does not support Value type."
+                match id with
+                | TSLIdxR -> IdxR (CAdded added)
+                | TSLIdx  -> Idx  (CAdded added)
+                | TSLPSts  ->PS   (CAdded added)
+                | TSL     -> KV   (CAdded added)
                 | _ -> failwith "Unsupported type in CAdded"
 
             | CUpdated -> 
-                match typeof<'Key> with
-                | t when t = kvkt -> KV CUpdated
-                | t when t = kht -> Idx CUpdated
-                | t when t = pst -> PS CUpdated
-                | t when t = kvvt -> failwith "CUpdated does not support Value type."
+                match id with
+                | TSLIdxR -> IdxR CUpdated
+                | TSLIdx  -> Idx  CUpdated
+                | TSLPSts -> PS   CUpdated
+                | TSL     -> KV   CUpdated
                 | _ -> failwith "Unsupported type in CUpdated"
 
             | CBool b -> 
-                match typeof<'Key> with
-                | t when t = kvkt -> KV (CBool b)
-                | t when t = kht -> Idx (CBool b)
-                | t when t = pst -> PS (CBool b)
-                | t when t = kvvt -> failwith "CBool does not support Value type."
+                match id with
+                | TSLIdxR -> IdxR (CBool b)
+                | TSLIdx  -> Idx  (CBool b)
+                | TSLPSts -> PS   (CBool b)
+                | TSL     -> KV   (CBool b)
                 | _ -> failwith "Unsupported type in CBool"
 
             | COptionValue (exists, value) -> 
                 let vt = typeof<'Value>
-                printfn "vvvvvvvv: %s %A" vt.Name value
-                match vt with
-                | t when t = kvkt -> 
-                    let vOpt = value |> Option.map (fun (SLK v) -> v)
+#if DEBUG1
+                printfn "vvvvvvvv: %s %A %A" vt.Name value id
+#endif
+                match id with
+                | TSLIdxR -> 
+                    let vOpt = value |> Option.map (fun (SLK v)  -> v)
                     IdxR (COptionValue (exists, vOpt))
-                | t when t = kvvt -> 
-                    let vOpt = value |> Option.map (fun (SLV v) -> v)
-                    KV (COptionValue (exists, vOpt))
-                | t when t = kht -> 
+                | TSL -> 
+                    let vOpt = value |> Option.map (fun (SLV v)  -> v)
+                    KV   (COptionValue (exists, vOpt))
+                | TSLIdx -> 
                     let vOpt = value |> Option.map (fun (SLKH v) -> v)
-                    Idx (COptionValue (exists, vOpt))
-                | t when t = pst -> 
+                    Idx  (COptionValue (exists, vOpt))
+                | TSLPSts -> 
                     let vOpt = value |> Option.map (fun (SLPS v) -> v)
-                    PS (COptionValue (exists, vOpt))
+                    PS   (COptionValue (exists, vOpt))
                 | _ -> failwith "Unsupported type in COptionValue"
 
             | CInt i -> 
-                match typeof<'Key> with
-                | t when t = kvkt -> KV (CInt i)
-                | t when t = kht -> Idx (CInt i)
-                | t when t = pst -> PS (CInt i)
-                | t when t = kvvt -> failwith "CInt does not support Value type."
+                match id with
+                | TSLIdxR -> IdxR (CInt i)
+                | TSLIdx  -> Idx  (CInt i)
+                | TSLPSts -> PS   (CInt i)
+                | TSL     -> KV   (CInt i)
                 | _ -> failwith "Unsupported type in CInt"
 
             | CKeyList keys -> 
-                match typeof<'Key>, typeof<'Value> with
-                | tk, tv when tk = kvkt && tv = kvvt -> 
+                //match typeof<'Key>, typeof<'Value> with
+                //| tk, tv when tk = kvkt && tv = kvvt -> 
+                //    let ks = keys |> Seq.map (fun (SLK k) -> k) |> (fun s -> List<_>(s)) :> IList<'Key>
+                //    KV (CKeyList ks)
+                //| tk, _ when tk = kht -> 
+                //    let ks = keys |> Seq.map (fun (SLKH k) -> k) |> (fun s -> List<_>(s)) :> IList<KeyHash>
+                //    IdxR (CKeyList ks)
+                //| tk, tv when tk = kvkt && tv = pst -> 
+                //    let ks = keys |> Seq.map (fun (SLK k) -> k) |> (fun s -> List<_>(s)) :> IList<'Key>
+                //    PS (CKeyList ks)
+                //| tk, tv when tk = kvvt && tv = kht -> 
+                //    let ks = keys |> Seq.map (fun (SLK k) -> k) |> (fun s -> List<_>(s)) :> IList<'Key>
+                //    Idx (CKeyList ks)
+                //| _ -> failwith "Unsupported type in CKeyList"
+                match id with
+                | TSL -> 
                     let ks = keys |> Seq.map (fun (SLK k) -> k) |> (fun s -> List<_>(s)) :> IList<'Key>
                     KV (CKeyList ks)
-                | tk, _ when tk = kht -> 
-                    let ks = keys |> Seq.map (fun (SLKH k) -> k) |> (fun s -> List<_>(s)) :> IList<KeyHash>
+                | TSLIdxR -> 
+                    let ks = keys |> Seq.map (fun (SLKH k) -> k)|> (fun s -> List<_>(s)) :> IList<KeyHash>
                     IdxR (CKeyList ks)
-                | tk, tv when tk = kvkt && tv = pst -> 
+                | TSLPSts -> 
                     let ks = keys |> Seq.map (fun (SLK k) -> k) |> (fun s -> List<_>(s)) :> IList<'Key>
                     PS (CKeyList ks)
-                | tk, tv when tk = kvvt && tv = kht -> 
+                | TSLIdx -> 
                     let ks = keys |> Seq.map (fun (SLK k) -> k) |> (fun s -> List<_>(s)) :> IList<'Key>
                     Idx (CKeyList ks)
                 | _ -> failwith "Unsupported type in CKeyList"
 
             | CValueList values -> 
-                match typeof<'Value> with
-                | t when t = kvkt -> 
+                match id with
+                | TSLIdxR -> 
                     let vs = values |> Seq.map (fun (SLK v) -> v) |> (fun s -> List<_>(s)) :> IList<'Key>
                     IdxR (CValueList vs)
-                | t when t = kvvt -> 
+                | TSL -> 
                     let vs = values |> Seq.map (fun (SLV v) -> v) |> (fun s -> List<_>(s)) :> IList<'Value>
                     KV (CValueList vs)
-                | t when t = kht -> 
-                    let vs = values |> Seq.map (fun (SLKH v) -> v) |> (fun s -> List<_>(s)) :> IList<KeyHash>
+                | TSLIdx -> 
+                    let vs = values |> Seq.map (fun (SLKH v) -> v)|> (fun s -> List<_>(s)) :> IList<KeyHash>
                     Idx (CValueList vs)
-                | t when t = pst -> 
-                    let vs = values |> Seq.map (fun (SLPS v) -> v) |> (fun s -> List<_>(s)) :> IList<SortedListPersistenceStatus>
+                | TSLPSts -> 
+                    let vs = values |> Seq.map (fun (SLPS v) -> v)|> (fun s -> List<_>(s)) :> IList<SortedListPersistenceStatus>
                     PS (CValueList vs)
                 | _ -> failwith "Unsupported type in CValueList"
 
 
 
 
-        static member eFun (taskResult: PCSLTaskTyp<'Key, 'Value>): OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>> =
+        static member eFun (id: SLTyp) (taskResult: PCSLTaskTyp<'Key, 'Value>): OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>> =
+#if DEBUG1            
+            printfn $"SLId: {id}: eFun"
+#endif
             match taskResult with
             | KV (o:OpResult<'Key, 'Value>) ->
                 match o with
@@ -1428,13 +1540,24 @@ module PTEST =
     //type fsv = Option<fstring>
 
     let pcsl = PersistedConcurrentSortedList<string, fsv>(
-        20, @"c:\pcsl", "test"
-        , PCSLFunHelper<string, fsv>.oFun
-        , PCSLFunHelper<string, fsv>.eFun)
+        20, @"c:\pfcfsl", "test"
+        , PFCFSLFunHelper<string, fsv>.oFun
+        , PFCFSLFunHelper<string, fsv>.eFun)
 
+
+    let s = [|0..100000|]|>Array.map (fun i -> S $"{i}")
+
+    let success = pcsl.Add ("ORZ", (A [| S "GG"|]), 3000)
+    let success2 = pcsl.Add ("ORZ2", (A s), 3000)
 
     pcsl.TryGetValue ("ORZ")
+    pcsl.TryGetValue ("ORZ2")
 
-    pcsl.Add ("ORZ", (A [| S "GG"|]), 3000)
+    
+    pcsl.GenerateKeyHash "ORZ"
+    pcsl.GetOrNewKeyHash "ORZ2"
 
-    pcsl._base
+    let b = pcsl._base
+    pcsl._idx._base.Keys
+    pcsl._idxR._base.Keys
+    pcsl._status._base.Keys

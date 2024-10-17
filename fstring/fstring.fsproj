@@ -5,8 +5,17 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
+    <DefineConstants>$(DefineConstants);ASYNC</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
 	  <Compile Include="Compression.fsx" />
+	  <None Include="PB 20241017 before use mailboxprocessor.fsx" />
 	  <None Include="PB 20241014.before_change.fsx" />
 	  <None Include="PB 20241014.fsx" />
       <Compile Include="PB.fsx" />
