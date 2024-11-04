@@ -75,7 +75,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\..\fstring\fstring.fsproj" />
     <ProjectReference Include="..\..\NTDLS.Katzebase.Client\NTDLS.Katzebase.Client.csproj" />
     <ProjectReference Include="..\..\NTDLS.Katzebase.Engine\NTDLS.Katzebase.Engine.csproj" />
     <ProjectReference Include="..\..\NTDLS.Katzebase.Server\NTDLS.Katzebase.Server.csproj" />

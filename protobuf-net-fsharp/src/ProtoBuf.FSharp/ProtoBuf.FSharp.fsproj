@@ -4,8 +4,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>protobuf-net-fsharp</AssemblyName>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <EnablePackageValidation>false</EnablePackageValidation>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <OutputPath>./bin</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="PostBuildEvent.ps1" />
     <Compile Include="MethodHelpers.fs" />
     <Compile Include="ZeroValues.fs" />
     <Compile Include="Surrogates.fs" />
@@ -13,5 +18,15 @@
     <Compile Include="ProtobufUtils.fs" />
     <Content Include="app.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\..\.paket\Paket.Restore.targets" />
+
+	<PropertyGroup>
+		<PackageId>FAkka.ProtoBuf.FSharp</PackageId>
+	</PropertyGroup>
+
+	<Target Name="PostPackNugetDeployWindows" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
+		<Exec Command="powershell -c &quot;write-host '====== Start Post-Build Event ======'&quot;&#xD;&#xA;powershell .\PostBuildEvent.ps1 FAkka.ProtoBuf.FSharp" />
+	</Target>
+	
 </Project>

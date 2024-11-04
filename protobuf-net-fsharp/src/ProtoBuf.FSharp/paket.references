@@ -1,2 +1,11 @@
 FSharp.Core
 protobuf-net
+protobuf-net.Core
+System.Buffers
+System.Collections.Immutable
+System.Memory
+System.Numerics.Vectors
+System.Reflection.Emit
+System.Reflection.Emit.ILGeneration
+System.Reflection.Emit.Lightweight
+System.Runtime.CompilerServices.Unsafe

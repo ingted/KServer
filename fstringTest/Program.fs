@@ -29,22 +29,6 @@ module PTEST =
                 | TSL     -> KV   CUnit
                 | _ -> failwith "Unsupported type in CUnit"
 
-            | CAdded added -> 
-                match id with
-                | TSLIdxR -> IdxR (CAdded added)
-                | TSLIdx  -> Idx  (CAdded added)
-                | TSLPSts  ->PS   (CAdded added)
-                | TSL     -> KV   (CAdded added)
-                | _ -> failwith "Unsupported type in CAdded"
-
-            | CUpdated -> 
-                match id with
-                | TSLIdxR -> IdxR CUpdated
-                | TSLIdx  -> Idx  CUpdated
-                | TSLPSts -> PS   CUpdated
-                | TSL     -> KV   CUpdated
-                | _ -> failwith "Unsupported type in CUpdated"
-
             | CBool b -> 
                 match id with
                 | TSLIdxR -> IdxR (CBool b)
@@ -55,7 +39,9 @@ module PTEST =
 
             | COptionValue (exists, value) -> 
                 let vt = typeof<'Value>
+#if DEBUG1
                 printfn "vvvvvvvv: %s %A %A" vt.Name value id
+#endif
                 match id with
                 | TSLIdxR -> 
                     let vOpt = value |> Option.map (fun (SLK v)  -> v)
@@ -129,16 +115,15 @@ module PTEST =
 
 
         static member eFun (id: SLTyp) (taskResult: PCSLTaskTyp<'Key, 'Value>): OpResult<PCSLKVTyp<'Key, 'Value>, PCSLKVTyp<'Key, 'Value>> =
+#if DEBUG1
             printfn $"SLId: {id}: eFun"
+#endif
             match taskResult with
             | KV (o:OpResult<'Key, 'Value>) ->
                 match o with
                 | CUnit -> 
                     CUnit
-                | CAdded added -> 
-                    CAdded added
-                | CUpdated -> 
-                    CUpdated
+
                 | CBool b -> 
                     CBool b
                 | COptionValue (exists, value) -> 
@@ -156,10 +141,7 @@ module PTEST =
                 match o with
                 | CUnit -> 
                     CUnit
-                | CAdded added -> 
-                    CAdded added
-                | CUpdated -> 
-                    CUpdated
+
                 | CBool b -> 
                     CBool b
                 | COptionValue (exists, value) -> 
@@ -177,10 +159,7 @@ module PTEST =
                 match o with
                 | CUnit -> 
                     CUnit
-                | CAdded added -> 
-                    CAdded added
-                | CUpdated -> 
-                    CUpdated
+
                 | CBool b -> 
                     CBool b
                 | COptionValue (exists, value) -> 
@@ -198,10 +177,7 @@ module PTEST =
                 match o with
                 | CUnit -> 
                     CUnit
-                | CAdded added -> 
-                    CAdded added
-                | CUpdated -> 
-                    CUpdated
+
                 | CBool b -> 
                     CBool b
                 | COptionValue (exists, value) -> 

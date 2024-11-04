@@ -10,7 +10,7 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyCompanyAttribute("fstringTest")>]
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Release")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+602405ecc409819a246ed0ec75d1d85e8a460f0f")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6efac612b8d932607b64af97c6e8738711504bcb")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("fstringTest")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("fstringTest")>]
 [<assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")>]

@@ -2,35 +2,10 @@
   "version": 3,
   "targets": {
     "net9.0": {
-      "Antlr4.Runtime.Standard/4.13.1": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/Antlr4.Runtime.Standard.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/Antlr4.Runtime.Standard.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "CoreCLR-NCalc/3.1.253": {
+      "FAkka.FsPickler/9.0.5": {
         "type": "package",
         "dependencies": {
-          "Antlr4.Runtime.Standard": "4.13.1"
-        },
-        "compile": {
-          "lib/net8.0/NCalc.dll": {}
-        },
-        "runtime": {
-          "lib/net8.0/NCalc.dll": {}
-        }
-      },
-      "FAkka.FsPickler/9.0.3": {
-        "type": "package",
-        "dependencies": {
-          "FSharp.Core": "9.0.100-beta.24406.3",
+          "FSharp.Core": "9.0.100-beta.24466.6",
           "System.Reflection.Emit.Lightweight": "4.7.0"
         },
         "compile": {
@@ -40,11 +15,11 @@
           "lib/net9.0/FsPickler.dll": {}
         }
       },
-      "FAkka.FsPickler.Json/9.0.3": {
+      "FAkka.FsPickler.Json/9.0.5": {
         "type": "package",
         "dependencies": {
-          "FAkka.FsPickler": "9.0.2",
-          "FSharp.Core": "9.0.100-beta.24406.3",
+          "FAkka.FsPickler": "9.0.5",
+          "FSharp.Core": "9.0.100-beta.24466.6",
           "Newtonsoft.Json": "13.0.3"
         },
         "compile": {
@@ -70,7 +45,7 @@
           }
         }
       },
-      "FSharp.Core/9.0.100-beta.24406.3": {
+      "FSharp.Core/9.0.100-beta.24466.6": {
         "type": "package",
         "compile": {
           "lib/netstandard2.1/FSharp.Core.dll": {
@@ -124,119 +99,6 @@
           }
         }
       },
-      "Microsoft.Extensions.Caching.Abstractions/8.0.0": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.Primitives": "8.0.0"
-        },
-        "compile": {
-          "lib/net8.0/Microsoft.Extensions.Caching.Abstractions.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/Microsoft.Extensions.Caching.Abstractions.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net6.0/_._": {}
-        }
-      },
-      "Microsoft.Extensions.Caching.Memory/8.0.0": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "8.0.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Options": "8.0.0",
-          "Microsoft.Extensions.Primitives": "8.0.0"
-        },
-        "compile": {
-          "lib/net8.0/Microsoft.Extensions.Caching.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/Microsoft.Extensions.Caching.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net6.0/_._": {}
-        }
-      },
-      "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.0": {
-        "type": "package",
-        "compile": {
-          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net6.0/_._": {}
-        }
-      },
-      "Microsoft.Extensions.Logging.Abstractions/8.0.0": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0"
-        },
-        "compile": {
-          "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net6.0/Microsoft.Extensions.Logging.Abstractions.targets": {}
-        }
-      },
-      "Microsoft.Extensions.Options/8.0.0": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Primitives": "8.0.0"
-        },
-        "compile": {
-          "lib/net8.0/Microsoft.Extensions.Options.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/Microsoft.Extensions.Options.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net6.0/Microsoft.Extensions.Options.targets": {}
-        }
-      },
-      "Microsoft.Extensions.Primitives/8.0.0": {
-        "type": "package",
-        "compile": {
-          "lib/net8.0/Microsoft.Extensions.Primitives.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/Microsoft.Extensions.Primitives.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net6.0/_._": {}
-        }
-      },
       "Newtonsoft.Json/13.0.3": {
         "type": "package",
         "compile": {
@@ -250,58 +112,10 @@
           }
         }
       },
-      "NTDLS.Helpers/1.3.3": {
+      "protobuf-net/3.2.26": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "8.0.0"
-        },
-        "compile": {
-          "lib/net8.0/NTDLS.Helpers.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/NTDLS.Helpers.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "NTDLS.ReliableMessaging/1.10.9": {
-        "type": "package",
-        "dependencies": {
-          "NTDLS.Helpers": "1.2.8",
-          "NTDLS.Semaphore": "3.4.2",
-          "Newtonsoft.Json": "13.0.3",
-          "protobuf-net": "3.2.30"
-        },
-        "compile": {
-          "lib/net8.0/NTDLS.ReliableMessaging.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/NTDLS.ReliableMessaging.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "NTDLS.Semaphore/3.4.2": {
-        "type": "package",
-        "compile": {
-          "lib/net8.0/NTDLS.Semaphore.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/NTDLS.Semaphore.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "protobuf-net/3.2.30": {
-        "type": "package",
-        "dependencies": {
-          "protobuf-net.Core": "3.2.30"
+          "protobuf-net.Core": "3.2.26"
         },
         "compile": {
           "lib/net6.0/protobuf-net.dll": {
@@ -314,7 +128,7 @@
           }
         }
       },
-      "protobuf-net.Core/3.2.30": {
+      "protobuf-net.Core/3.2.26": {
         "type": "package",
         "dependencies": {
           "System.Collections.Immutable": "7.0.0"
@@ -416,38 +230,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         }
       },
-      "NTDLS.Katzebase.Client.dev/0.22.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "8.0.0",
-          "NTDLS.Helpers": "1.2.11",
-          "NTDLS.ReliableMessaging": "1.10.9",
-          "Newtonsoft.Json": "13.0.3"
-        },
-        "compile": {
-          "bin/placeholder/NTDLS.Katzebase.Client.dev.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/NTDLS.Katzebase.Client.dev.dll": {}
-        }
-      },
-      "NTDLS.Katzebase.Parsers.Generic/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v8.0",
-        "dependencies": {
-          "CoreCLR-NCalc": "3.1.253",
-          "NTDLS.Helpers": "1.3.3",
-          "NTDLS.Katzebase.Client.dev": "0.22.0"
-        },
-        "compile": {
-          "bin/placeholder/NTDLS.Katzebase.Parsers.Generic.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/NTDLS.Katzebase.Parsers.Generic.dll": {}
-        }
-      },
-      "protobuf-net-fsharp/1.0.0": {
+      "FAkka.ProtoBuf.FSharp/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -464,71 +247,37 @@
           "protobuf-net.Core": "3.2.26"
         },
         "compile": {
-          "bin/placeholder/protobuf-net-fsharp.dll": {}
+          "bin/placeholder/FAkka.ProtoBuf.FSharp.dll": {}
         },
         "runtime": {
-          "bin/placeholder/protobuf-net-fsharp.dll": {}
+          "bin/placeholder/FAkka.ProtoBuf.FSharp.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "Antlr4.Runtime.Standard/4.13.1": {
-      "sha512": "Da5+i4kFHUseJRZGcBG5fmZGpA/Ns180ibrQMxgZzjpQOnENVvSL5gi5HZ8Ncz8/AR2WsKbOg2lMBzjz0HUQcA==",
+    "FAkka.FsPickler/9.0.5": {
+      "sha512": "/cDZ473RTQC1dOGEGR0Wbx9Hb+WRjIWMWKZhFosNE272vxk0GCQrULJ+WygRffkhiorMIFOVo+/DTVto0ZmYpA==",
       "type": "package",
-      "path": "antlr4.runtime.standard/4.13.1",
+      "path": "fakka.fspickler/9.0.5",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
-        "antlr4.runtime.standard.4.13.1.nupkg.sha512",
-        "antlr4.runtime.standard.nuspec",
-        "lib/net45/Antlr4.Runtime.Standard.dll",
-        "lib/net45/Antlr4.Runtime.Standard.xml",
-        "lib/netstandard2.0/Antlr4.Runtime.Standard.dll",
-        "lib/netstandard2.0/Antlr4.Runtime.Standard.xml"
-      ]
-    },
-    "CoreCLR-NCalc/3.1.253": {
-      "sha512": "XrcIZAbjsnW+4/PJKd8bbfeDMYEM41cKK13DmgIRoH2+UPpoiu2mF7gfdfAsr10ePrzH4NyfD8Y3u8nbj9G2lQ==",
-      "type": "package",
-      "path": "coreclr-ncalc/3.1.253",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "coreclr-ncalc.3.1.253.nupkg.sha512",
-        "coreclr-ncalc.nuspec",
-        "lib/net45/NCalc.dll",
-        "lib/net6.0/NCalc.dll",
-        "lib/net8.0/NCalc.dll",
-        "lib/netstandard2.0/NCalc.dll",
-        "ncalc.png"
-      ]
-    },
-    "FAkka.FsPickler/9.0.3": {
-      "sha512": "sj3pcYZRZZnpcUBXvv21Ga2yDCJmtFzitU11a+ce3s+a9F845MrfQTUlGE3dMP50YQwKJTlmZb5lmyIzIoFIDw==",
-      "type": "package",
-      "path": "fakka.fspickler/9.0.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
         "LICENSE.txt",
         "README.md",
-        "fakka.fspickler.9.0.3.nupkg.sha512",
+        "fakka.fspickler.9.0.5.nupkg.sha512",
         "fakka.fspickler.nuspec",
         "lib/net9.0/FsPickler.dll"
       ]
     },
-    "FAkka.FsPickler.Json/9.0.3": {
-      "sha512": "Wx5GL4DcFY7lGvgrxgCFX/FqPvY/aiAPZgZtprcmpmV+N5oFzgT4spl9jwygZfai0G/NDv3e0HfksNOqqzU76g==",
+    "FAkka.FsPickler.Json/9.0.5": {
+      "sha512": "1NIDiNX5MqhbxcPyxS3aTY25hJU05B9qnxlpfUadm6ERItzoyE1dO8vaNW2SkZ6aYbeJq0aPu11KF64spF4J2g==",
       "type": "package",
-      "path": "fakka.fspickler.json/9.0.3",
+      "path": "fakka.fspickler.json/9.0.5",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "LICENSE.txt",
         "README.md",
-        "fakka.fspickler.json.9.0.3.nupkg.sha512",
+        "fakka.fspickler.json.9.0.5.nupkg.sha512",
         "fakka.fspickler.json.nuspec",
         "lib/net9.0/FsPickler.Json.dll"
       ]
@@ -547,15 +296,15 @@
         "logo.png"
       ]
     },
-    "FSharp.Core/9.0.100-beta.24406.3": {
-      "sha512": "w3q+hTyiwyVHPvq3mAvlCWj1LUsP3kWmmpnX/VOOAaC8SKeeGLBFbBks7NWnnZ35Qn2YgNyDEHP5f7LEkdMFWA==",
+    "FSharp.Core/9.0.100-beta.24466.6": {
+      "sha512": "VdkJ1cUa55TK4T+ewwtZA3un369qbI8VtbWL6SoeenX/phA0xsMHNlTHtmACUOAD5Ul2AqippqM4DP859holFg==",
       "type": "package",
-      "path": "fsharp.core/9.0.100-beta.24406.3",
+      "path": "fsharp.core/9.0.100-beta.24466.6",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
-        "fsharp.core.9.0.100-beta.24406.3.nupkg.sha512",
+        "fsharp.core.9.0.100-beta.24466.6.nupkg.sha512",
         "fsharp.core.nuspec",
         "lib/netstandard2.0/FSharp.Core.dll",
         "lib/netstandard2.0/FSharp.Core.xml",
@@ -589,248 +338,6 @@
         "lib/netstandard2.1/zh-Hant/FSharp.Core.resources.dll"
       ]
     },
-    "Microsoft.Extensions.Caching.Abstractions/8.0.0": {
-      "sha512": "3KuSxeHoNYdxVYfg2IRZCThcrlJ1XJqIXkAWikCsbm5C/bCjv7G0WoKDyuR98Q+T607QT2Zl5GsbGRkENcV2yQ==",
-      "type": "package",
-      "path": "microsoft.extensions.caching.abstractions/8.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/Microsoft.Extensions.Caching.Abstractions.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net6.0/_._",
-        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Caching.Abstractions.targets",
-        "lib/net462/Microsoft.Extensions.Caching.Abstractions.dll",
-        "lib/net462/Microsoft.Extensions.Caching.Abstractions.xml",
-        "lib/net6.0/Microsoft.Extensions.Caching.Abstractions.dll",
-        "lib/net6.0/Microsoft.Extensions.Caching.Abstractions.xml",
-        "lib/net7.0/Microsoft.Extensions.Caching.Abstractions.dll",
-        "lib/net7.0/Microsoft.Extensions.Caching.Abstractions.xml",
-        "lib/net8.0/Microsoft.Extensions.Caching.Abstractions.dll",
-        "lib/net8.0/Microsoft.Extensions.Caching.Abstractions.xml",
-        "lib/netstandard2.0/Microsoft.Extensions.Caching.Abstractions.dll",
-        "lib/netstandard2.0/Microsoft.Extensions.Caching.Abstractions.xml",
-        "microsoft.extensions.caching.abstractions.8.0.0.nupkg.sha512",
-        "microsoft.extensions.caching.abstractions.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
-    "Microsoft.Extensions.Caching.Memory/8.0.0": {
-      "sha512": "7pqivmrZDzo1ADPkRwjy+8jtRKWRCPag9qPI+p7sgu7Q4QreWhcvbiWXsbhP+yY8XSiDvZpu2/LWdBv7PnmOpQ==",
-      "type": "package",
-      "path": "microsoft.extensions.caching.memory/8.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/Microsoft.Extensions.Caching.Memory.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net6.0/_._",
-        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Caching.Memory.targets",
-        "lib/net462/Microsoft.Extensions.Caching.Memory.dll",
-        "lib/net462/Microsoft.Extensions.Caching.Memory.xml",
-        "lib/net6.0/Microsoft.Extensions.Caching.Memory.dll",
-        "lib/net6.0/Microsoft.Extensions.Caching.Memory.xml",
-        "lib/net7.0/Microsoft.Extensions.Caching.Memory.dll",
-        "lib/net7.0/Microsoft.Extensions.Caching.Memory.xml",
-        "lib/net8.0/Microsoft.Extensions.Caching.Memory.dll",
-        "lib/net8.0/Microsoft.Extensions.Caching.Memory.xml",
-        "lib/netstandard2.0/Microsoft.Extensions.Caching.Memory.dll",
-        "lib/netstandard2.0/Microsoft.Extensions.Caching.Memory.xml",
-        "microsoft.extensions.caching.memory.8.0.0.nupkg.sha512",
-        "microsoft.extensions.caching.memory.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
-    "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.0": {
-      "sha512": "cjWrLkJXK0rs4zofsK4bSdg+jhDLTaxrkXu4gS6Y7MAlCvRyNNgwY/lJi5RDlQOnSZweHqoyvgvbdvQsRIW+hg==",
-      "type": "package",
-      "path": "microsoft.extensions.dependencyinjection.abstractions/8.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/Microsoft.Extensions.DependencyInjection.Abstractions.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net6.0/_._",
-        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.DependencyInjection.Abstractions.targets",
-        "lib/net462/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-        "lib/net462/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-        "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "lib/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-        "lib/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-        "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-        "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
-        "microsoft.extensions.dependencyinjection.abstractions.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
-    "Microsoft.Extensions.Logging.Abstractions/8.0.0": {
-      "sha512": "arDBqTgFCyS0EvRV7O3MZturChstm50OJ0y9bDJvAcmEPJm0FFpFyjU/JLYyStNGGey081DvnQYlncNX5SJJGA==",
-      "type": "package",
-      "path": "microsoft.extensions.logging.abstractions/8.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "analyzers/dotnet/roslyn3.11/cs/Microsoft.Extensions.Logging.Generators.dll",
-        "analyzers/dotnet/roslyn3.11/cs/cs/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/de/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/es/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/fr/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/it/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/ja/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/ko/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/pl/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/pt-BR/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/ru/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/tr/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/zh-Hans/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn3.11/cs/zh-Hant/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/Microsoft.Extensions.Logging.Generators.dll",
-        "analyzers/dotnet/roslyn4.0/cs/cs/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/de/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/es/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/fr/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/it/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/ja/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/ko/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/pl/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/pt-BR/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/ru/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/tr/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/zh-Hans/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.0/cs/zh-Hant/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll",
-        "analyzers/dotnet/roslyn4.4/cs/cs/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/de/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/es/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/fr/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/it/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/ja/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/ko/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/pl/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/pt-BR/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/ru/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/tr/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/zh-Hans/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/zh-Hant/Microsoft.Extensions.Logging.Generators.resources.dll",
-        "buildTransitive/net461/Microsoft.Extensions.Logging.Abstractions.targets",
-        "buildTransitive/net462/Microsoft.Extensions.Logging.Abstractions.targets",
-        "buildTransitive/net6.0/Microsoft.Extensions.Logging.Abstractions.targets",
-        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Logging.Abstractions.targets",
-        "buildTransitive/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.targets",
-        "lib/net462/Microsoft.Extensions.Logging.Abstractions.dll",
-        "lib/net462/Microsoft.Extensions.Logging.Abstractions.xml",
-        "lib/net6.0/Microsoft.Extensions.Logging.Abstractions.dll",
-        "lib/net6.0/Microsoft.Extensions.Logging.Abstractions.xml",
-        "lib/net7.0/Microsoft.Extensions.Logging.Abstractions.dll",
-        "lib/net7.0/Microsoft.Extensions.Logging.Abstractions.xml",
-        "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll",
-        "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.xml",
-        "lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.dll",
-        "lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.xml",
-        "microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
-        "microsoft.extensions.logging.abstractions.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
-    "Microsoft.Extensions.Options/8.0.0": {
-      "sha512": "JOVOfqpnqlVLUzINQ2fox8evY2SKLYJ3BV8QDe/Jyp21u1T7r45x/R/5QdteURMR5r01GxeJSBBUOCOyaNXA3g==",
-      "type": "package",
-      "path": "microsoft.extensions.options/8.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll",
-        "analyzers/dotnet/roslyn4.4/cs/cs/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/de/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/es/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/fr/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/it/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/ja/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/ko/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/pl/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/pt-BR/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/ru/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/tr/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/zh-Hans/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "analyzers/dotnet/roslyn4.4/cs/zh-Hant/Microsoft.Extensions.Options.SourceGeneration.resources.dll",
-        "buildTransitive/net461/Microsoft.Extensions.Options.targets",
-        "buildTransitive/net462/Microsoft.Extensions.Options.targets",
-        "buildTransitive/net6.0/Microsoft.Extensions.Options.targets",
-        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Options.targets",
-        "buildTransitive/netstandard2.0/Microsoft.Extensions.Options.targets",
-        "lib/net462/Microsoft.Extensions.Options.dll",
-        "lib/net462/Microsoft.Extensions.Options.xml",
-        "lib/net6.0/Microsoft.Extensions.Options.dll",
-        "lib/net6.0/Microsoft.Extensions.Options.xml",
-        "lib/net7.0/Microsoft.Extensions.Options.dll",
-        "lib/net7.0/Microsoft.Extensions.Options.xml",
-        "lib/net8.0/Microsoft.Extensions.Options.dll",
-        "lib/net8.0/Microsoft.Extensions.Options.xml",
-        "lib/netstandard2.0/Microsoft.Extensions.Options.dll",
-        "lib/netstandard2.0/Microsoft.Extensions.Options.xml",
-        "lib/netstandard2.1/Microsoft.Extensions.Options.dll",
-        "lib/netstandard2.1/Microsoft.Extensions.Options.xml",
-        "microsoft.extensions.options.8.0.0.nupkg.sha512",
-        "microsoft.extensions.options.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
-    "Microsoft.Extensions.Primitives/8.0.0": {
-      "sha512": "bXJEZrW9ny8vjMF1JV253WeLhpEVzFo1lyaZu1vQ4ZxWUlVvknZ/+ftFgVheLubb4eZPSwwxBeqS1JkCOjxd8g==",
-      "type": "package",
-      "path": "microsoft.extensions.primitives/8.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/Microsoft.Extensions.Primitives.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net6.0/_._",
-        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Primitives.targets",
-        "lib/net462/Microsoft.Extensions.Primitives.dll",
-        "lib/net462/Microsoft.Extensions.Primitives.xml",
-        "lib/net6.0/Microsoft.Extensions.Primitives.dll",
-        "lib/net6.0/Microsoft.Extensions.Primitives.xml",
-        "lib/net7.0/Microsoft.Extensions.Primitives.dll",
-        "lib/net7.0/Microsoft.Extensions.Primitives.xml",
-        "lib/net8.0/Microsoft.Extensions.Primitives.dll",
-        "lib/net8.0/Microsoft.Extensions.Primitives.xml",
-        "lib/netstandard2.0/Microsoft.Extensions.Primitives.dll",
-        "lib/netstandard2.0/Microsoft.Extensions.Primitives.xml",
-        "microsoft.extensions.primitives.8.0.0.nupkg.sha512",
-        "microsoft.extensions.primitives.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
     "Newtonsoft.Json/13.0.3": {
       "sha512": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ==",
       "type": "package",
@@ -861,67 +368,10 @@
         "packageIcon.png"
       ]
     },
-    "NTDLS.Helpers/1.3.3": {
-      "sha512": "PyJ1Fh+1aGKno4eBc+Qw2NCV9ioa1EEssZF6I1jba5nGLfe1Qb8cVi8PKwhqHrQj5/3bwYwmPd+WF+lrj236jA==",
+    "protobuf-net/3.2.26": {
+      "sha512": "zBzBiKs4yP+tzQOsRA5WbI/zayS6eFv8g0KIKNPI7/RUY1nk9Oe+STmtbUYkNUkO3T3SidEoZv+tF1nmgTSutQ==",
       "type": "package",
-      "path": "ntdls.helpers/1.3.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Logo.png",
-        "README.md",
-        "lib/net6.0/NTDLS.Helpers.dll",
-        "lib/net6.0/NTDLS.Helpers.xml",
-        "lib/net7.0/NTDLS.Helpers.dll",
-        "lib/net7.0/NTDLS.Helpers.xml",
-        "lib/net8.0/NTDLS.Helpers.dll",
-        "lib/net8.0/NTDLS.Helpers.xml",
-        "ntdls.helpers.1.3.3.nupkg.sha512",
-        "ntdls.helpers.nuspec"
-      ]
-    },
-    "NTDLS.ReliableMessaging/1.10.9": {
-      "sha512": "I2NybDX2UMOIKwMLT3dzuRxP6v9Lei0COItt6qop7HJ7INIRFB1UaEkSbWd9Be4mtH+lmrraSscnwjSDEVkEuQ==",
-      "type": "package",
-      "path": "ntdls.reliablemessaging/1.10.9",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "128.png",
-        "README.md",
-        "lib/net6.0/NTDLS.ReliableMessaging.dll",
-        "lib/net6.0/NTDLS.ReliableMessaging.xml",
-        "lib/net7.0/NTDLS.ReliableMessaging.dll",
-        "lib/net7.0/NTDLS.ReliableMessaging.xml",
-        "lib/net8.0/NTDLS.ReliableMessaging.dll",
-        "lib/net8.0/NTDLS.ReliableMessaging.xml",
-        "ntdls.reliablemessaging.1.10.9.nupkg.sha512",
-        "ntdls.reliablemessaging.nuspec"
-      ]
-    },
-    "NTDLS.Semaphore/3.4.2": {
-      "sha512": "DFHM7E8iDKZ/K3XU73Af503L9DWuhToMKWKxgS1ePAqiBXmkJHQyQTfS7MvpTaXqPQ7Uiisv4U67mXAlbBcjtg==",
-      "type": "package",
-      "path": "ntdls.semaphore/3.4.2",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Logo.png",
-        "README.md",
-        "lib/net6.0/NTDLS.Semaphore.dll",
-        "lib/net6.0/NTDLS.Semaphore.xml",
-        "lib/net7.0/NTDLS.Semaphore.dll",
-        "lib/net7.0/NTDLS.Semaphore.xml",
-        "lib/net8.0/NTDLS.Semaphore.dll",
-        "lib/net8.0/NTDLS.Semaphore.xml",
-        "ntdls.semaphore.3.4.2.nupkg.sha512",
-        "ntdls.semaphore.nuspec"
-      ]
-    },
-    "protobuf-net/3.2.30": {
-      "sha512": "C/UTlmxEJHAHpqm8xQK1UyJKaIynVCSNG4mVrbLgnZ7ccH28nN49O8iMJvKEodTgVbnimvy+3mIiAdW6mATwnw==",
-      "type": "package",
-      "path": "protobuf-net/3.2.30",
+      "path": "protobuf-net/3.2.26",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -933,15 +383,15 @@
         "lib/netstandard2.0/protobuf-net.xml",
         "lib/netstandard2.1/protobuf-net.dll",
         "lib/netstandard2.1/protobuf-net.xml",
-        "protobuf-net.3.2.30.nupkg.sha512",
+        "protobuf-net.3.2.26.nupkg.sha512",
         "protobuf-net.nuspec",
         "protobuf-net.png"
       ]
     },
-    "protobuf-net.Core/3.2.30": {
-      "sha512": "v2ZxxYrz+X212ukSx+uqkLuPu414bvmSAnTyf+PBUKR9ENJxO4P/csorA/27456MCp1JNoMssDj/f91RDiwBfQ==",
+    "protobuf-net.Core/3.2.26": {
+      "sha512": "s8oJW9dBVxix4p8uqMbeG++DIGjgzOFAKoP2i5wayeeFOKBqG+cCBO2S/CAC4MAFlb5m1Os2m/miLcqRCgqJ7Q==",
       "type": "package",
-      "path": "protobuf-net.core/3.2.30",
+      "path": "protobuf-net.core/3.2.26",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -953,7 +403,7 @@
         "lib/netstandard2.0/protobuf-net.Core.xml",
         "lib/netstandard2.1/protobuf-net.Core.dll",
         "lib/netstandard2.1/protobuf-net.Core.xml",
-        "protobuf-net.core.3.2.30.nupkg.sha512",
+        "protobuf-net.core.3.2.26.nupkg.sha512",
         "protobuf-net.core.nuspec",
         "protobuf-net.png"
       ]
@@ -1282,17 +732,7 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "NTDLS.Katzebase.Client.dev/0.22.0": {
-      "type": "project",
-      "path": "../NTDLS.Katzebase.Client/NTDLS.Katzebase.Client.csproj",
-      "msbuildProject": "../NTDLS.Katzebase.Client/NTDLS.Katzebase.Client.csproj"
-    },
-    "NTDLS.Katzebase.Parsers.Generic/1.0.0": {
-      "type": "project",
-      "path": "../NTDLS.Katzebase.Parsers.Generic/NTDLS.Katzebase.Parsers.Generic.csproj",
-      "msbuildProject": "../NTDLS.Katzebase.Parsers.Generic/NTDLS.Katzebase.Parsers.Generic.csproj"
-    },
-    "protobuf-net-fsharp/1.0.0": {
+    "FAkka.ProtoBuf.FSharp/1.0.0": {
       "type": "project",
       "path": "../protobuf-net-fsharp/src/ProtoBuf.FSharp/ProtoBuf.FSharp.fsproj",
       "msbuildProject": "../protobuf-net-fsharp/src/ProtoBuf.FSharp/ProtoBuf.FSharp.fsproj"
@@ -1300,29 +740,33 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "FAkka.FsPickler >= 9.0.3",
-      "FAkka.FsPickler.Json >= 9.0.3",
+      "FAkka.FsPickler >= 9.0.5",
+      "FAkka.FsPickler.Json >= 9.0.5",
+      "FAkka.ProtoBuf.FSharp >= 1.0.0",
       "FSharp.Collections.ParallelSeq >= 1.2.0",
-      "FSharp.Core >= 9.0.100-beta.24406.3",
-      "NTDLS.Katzebase.Parsers.Generic >= 1.0.0",
-      "protobuf-net-fsharp >= 1.0.0"
+      "FSharp.Core >= 9.0.100-beta.24466.6"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Administrator\\.nuget\\packages\\": {}
+    "C:\\Users\\Administrator\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "9.0.5",
     "restore": {
-      "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\fstring.fsproj",
-      "projectName": "fstring",
-      "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\fstring.fsproj",
+      "projectUniqueName": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
+      "projectName": "PersistedConcurrentSortedList",
+      "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\PersistedConcurrentSortedList.fsproj",
       "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
       "outputPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\fstring\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -1331,16 +775,13 @@
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Program Files\\dotnet\\library-packs": {},
-        "C:\\Program Files\\dotnet\\sdk\\9.0.100-preview.7.24407.12\\FSharp\\library-packs": {},
+        "C:\\Program Files\\dotnet\\sdk\\9.0.100-rc.2.24474.11\\FSharp\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj": {
-              "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj"
-            },
             "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj": {
               "projectPath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\protobuf-net-fsharp\\src\\ProtoBuf.FSharp\\ProtoBuf.FSharp.fsproj"
             }
@@ -1350,7 +791,7 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "direct"
+        "auditMode": "all"
       }
     },
     "frameworks": {
@@ -1359,12 +800,12 @@
         "dependencies": {
           "FAkka.FsPickler": {
             "target": "Package",
-            "version": "[9.0.3, )",
+            "version": "[9.0.5, )",
             "generatePathProperty": true
           },
           "FAkka.FsPickler.Json": {
             "target": "Package",
-            "version": "[9.0.3, )",
+            "version": "[9.0.5, )",
             "generatePathProperty": true
           },
           "FSharp.Collections.ParallelSeq": {
@@ -1375,7 +816,7 @@
           "FSharp.Core": {
             "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
             "target": "Package",
-            "version": "[9.0.100-beta.24406.3, )",
+            "version": "[9.0.100-beta.24466.6, )",
             "generatePathProperty": true
           }
         },
@@ -1390,18 +831,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.Net.Sdk.Compilers.Toolset",
-            "version": "[9.0.100-preview.7.24407.12, 9.0.100-preview.7.24407.12]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-preview.7.24407.12/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-rc.2.24474.11/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -8,3 +8,12 @@ nuget Expecto >= 9.0 < 10.0
 nuget Expecto.FsCheck >= 9.0 < 10.0
 nuget YoloDev.Expecto.TestSdk >= 0.13 < 0.14
 nuget Microsoft.NET.Test.Sdk
+nuget protobuf-net.Core
+nuget System.Buffers
+nuget System.Collections.Immutable
+nuget System.Memory
+nuget System.Numerics.Vectors
+nuget System.Reflection.Emit
+nuget System.Reflection.Emit.ILGeneration
+nuget System.Reflection.Emit.Lightweight
+nuget System.Runtime.CompilerServices.Unsafe
