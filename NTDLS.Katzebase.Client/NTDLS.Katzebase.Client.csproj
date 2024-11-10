@@ -30,6 +30,7 @@
       Updated nullable helper package.
     </PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Configurations>Debug;Release;DebugWithNoDep</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -10,6 +10,7 @@
     <Authors>NetworkDLS</Authors>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <OutputType>Exe</OutputType>
+    <Configurations>Debug;Release;DebugWithNoDep</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

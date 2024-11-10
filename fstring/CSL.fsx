@@ -16,11 +16,19 @@ module CSL =
         // 直接創建 Memory，指向指定的陣列區段
         Memory<'T>(arr, start, tLength)
 
-    let inline getKeys (sl: SortedList<'k, _>) =
+    let 
+#if RELEASE
+        inline 
+#endif
+        getKeys (sl: SortedList<'k, _>) =
         let fi = sl.GetType().GetField("keys", BindingFlags.Instance ||| BindingFlags.NonPublic)
         fi.GetValue sl |> unbox<'k[]>
 
-    let inline getValues (sl: SortedList<_, 'v>) =
+    let 
+#if RELEASE
+        inline 
+#endif 
+        getValues (sl: SortedList<_, 'v>) =
         let fi = sl.GetType().GetField("values", BindingFlags.Instance ||| BindingFlags.NonPublic)
         fi.GetValue sl |> unbox<'v[]>
 
@@ -232,8 +240,8 @@ module CSL =
                         let mutable ifSwitched = false
     #if DEBUG
                         printfn "[%A] dequeued %A, messageQueue count: %d" slId task messageQueue.Count
-    #endif
                         printfn "Cmd received: %A" taskOpt.Value
+    #endif
                     //| Some qpCmd when status = Listenning ->
                         //let rec getCmdAndProceed (latestCmdToAppendOpt: _ option) =
                         //    let ifD, m = messageQueue.TryDequeue () 
@@ -253,7 +261,9 @@ module CSL =
                         and getCmdAndProceedBeforeLatestCmdProceed latestCmdToAppend =
                             let ifD, m = messageQueue.TryDequeue () 
                             if ifD then
+#if DEBUG
                                 printfn "Enqueue latestCmd first: %A" latestCmdToAppend
+#endif
                                 messageQueue.Enqueue latestCmdToAppend
                                 procCmd m
                                 
@@ -266,12 +276,16 @@ module CSL =
 
                         and execute (task:Task<'OpResult>) =
                             task.Start ()
+#if DEBUG
                             printfn "Task %A started" task.Id
+#endif
                             let tr = task |> Async.AwaitTask |> Async.Catch |> Async.StartAsTask // 同步執行任務
 
                             match tr.Result with
                             | Choice1Of2 s -> 
+#if DEBUG
                                 printfn "Task %A IsCompleted: %A" task.Id task.IsCompleted
+#endif
 #if DEBUG1
                                 printfn "Successfully: %A" s
 #endif
@@ -282,31 +296,45 @@ module CSL =
       
 
                         and procCmd cmd =
+#if DEBUG
                             printfn "Cmd proceeding: %A" cmd
+#endif
                             match status with
                             | Locked curLockGuid ->
+#if DEBUG
                                 printfn "Current lock context: %A" curLockGuid
+#endif
                                 match cmd with
                                 | SysUnlock g 
                                 | Unlock g when g = curLockGuid -> 
+#if DEBUG
                                     printfn "Unlocked! context:%A" g
+#endif
                                     goAhead Listenning
 
                                 | Tsk (task, (Some g)) when g = curLockGuid ->
+#if DEBUG
                                     printfn "Execute task in same lockId context! context:%A, cmd:%A" curLockGuid g
+#endif
                                     execute task
                                     getCmdAndProceed ()
                                 | _ when ifSwitched = false ->
+#if DEBUG
                                     printfn "Enqueue task in different context firstTime! context:%A" curLockGuid
+#endif
                                     ifSwitched <- true
                                     messageQueueTmp.Enqueue cmd
                                     getCmdAndProceed ()
                                 | _ ->
+#if DEBUG
                                     printfn "Enqueue task in different context! context:%A" curLockGuid
+#endif
                                     messageQueueTmp.Enqueue cmd
                                     getCmdAndProceed ()
                             | Listenning ->
+#if DEBUG
                                 printfn "Listenning, no lock context."
+#endif
                                 match cmd with
                                 | Tsk (_, (Some g)) ->
                                     execute (task {
@@ -337,7 +365,9 @@ module CSL =
                         else
                             getCmdAndProceedBeforeLatestCmdProceed taskOpt.Value
                         if ifSwitched then
+#if DEBUG
                             printfn "queue switched"
+#endif
                             messageQueue <- messageQueueTmp
                             messageQueueTmp <- Queue<QueueProcessorCmd<'OpResult>>()
                         if messageQueue.Count > 0 && status = Listenning then 
@@ -387,6 +417,7 @@ module CSL =
         , extractFunBase:'ID -> 'OpResult -> OpResult<'Key, 'Value>
         , lockObj: obj
         , timeoutDefault
+        , ?autoCacheChange:int 
         ) =
         let sortedList = SortedList<'Key, 'Value>()
         //let lockObj = obj()
@@ -404,7 +435,8 @@ module CSL =
             
             try
                 let added = sortedList.TryAdd(key, value)
-                SortedListCache<_, _>.CacheChange sortedList
+                if autoCacheChange.IsSome then
+                    SortedListCache<_, _>.CacheChange sortedList
 #if DEBUG1
                 printfn "[%A] %A, %A added" slId key value
 #endif
@@ -416,7 +448,8 @@ module CSL =
         member this.TryRemoveBase(key: 'Key) =
             try
                 let removed = sortedList.Remove(key)
-                SortedListCache<_, _>.CacheChange sortedList
+                if autoCacheChange.IsSome then
+                    SortedListCache<_, _>.CacheChange sortedList
                 removed
             with
             | _ -> false
@@ -435,7 +468,8 @@ module CSL =
                 2
             else
                 if sortedList.TryAdd (key, newValue) then
-                    SortedListCache<_, _>.CacheChange sortedList
+                    if autoCacheChange.IsSome then
+                        SortedListCache<_, _>.CacheChange sortedList
                     1
                 else
                     0
@@ -575,7 +609,9 @@ module CSL =
                 //|> Seq.map (fun f -> (fun () -> f()|> outFun slId) |> createTask)
                 |> Seq.map (fun f -> f >> outFun slId |> createTask)
                 |> Seq.toArray //沒有 toArray 會出現 task id 不同的症狀，也就是跑的 task 跟回傳的 task 不同 (seq map 的 lazy evaluation 特性造成)
+#if DEBUG
             ts |> Seq.iter (fun task -> printfn "[before starting] Task %A IsCompleted: %A" task.Id task.IsCompleted)
+#endif
             ts
             |> if lockIdOpt.IsNone then
                 Seq.iter opQueue.Enqueue 
@@ -721,6 +757,9 @@ module CSL =
 
         member this.UnLock (lockId) =
             this.OpQueue.UnLock lockId
+
+        new (slId, outFun, extractFunBase, (autoCache: int)) =
+            new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000, autoCacheChange = autoCache)
 
         new (slId, outFun, extractFunBase) =
             new ConcurrentSortedList<_, _, _, _>(slId, outFun, extractFunBase, obj(), 300000)

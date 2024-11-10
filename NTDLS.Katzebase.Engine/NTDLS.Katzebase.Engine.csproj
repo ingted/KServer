@@ -10,9 +10,14 @@
     <Version>0.21.0</Version>
     <Authors>NetworkDLS</Authors>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <Configurations>Debug;Release;DebugWithNoDep</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);UNITTEST_VER_0_0_1_MOD</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugWithNoDep|AnyCPU'">
     <DefineConstants>$(DefineConstants);UNITTEST_VER_0_0_1_MOD</DefineConstants>
   </PropertyGroup>
 
