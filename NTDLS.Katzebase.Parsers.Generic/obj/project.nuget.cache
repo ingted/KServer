@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "et79olLoGNI=",
+  "dgSpecHash": "DCbsOaPR8NA=",
   "success": true,
   "projectFilePath": "G:\\coldfar_py\\sharftrade9\\Libs5\\KServer\\NTDLS.Katzebase.Parsers.Generic\\NTDLS.Katzebase.Parsers.Generic.csproj",
   "expectedPackageFiles": [
@@ -18,11 +18,7 @@
     "C:\\Users\\Administrator\\.nuget\\packages\\ntdls.semaphore\\3.4.2\\ntdls.semaphore.3.4.2.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\protobuf-net\\3.2.30\\protobuf-net.3.2.30.nupkg.sha512",
     "C:\\Users\\Administrator\\.nuget\\packages\\protobuf-net.core\\3.2.30\\protobuf-net.core.3.2.30.nupkg.sha512",
-    "C:\\Users\\Administrator\\.nuget\\packages\\system.collections.immutable\\7.0.0\\system.collections.immutable.7.0.0.nupkg.sha512",
-    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.net.sdk.compilers.toolset\\9.0.100-preview.7.24407.12\\microsoft.net.sdk.compilers.toolset.9.0.100-preview.7.24407.12.nupkg.sha512",
-    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.7\\microsoft.windowsdesktop.app.ref.8.0.7.nupkg.sha512",
-    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.7\\microsoft.netcore.app.ref.8.0.7.nupkg.sha512",
-    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.7\\microsoft.aspnetcore.app.ref.8.0.7.nupkg.sha512"
+    "C:\\Users\\Administrator\\.nuget\\packages\\system.collections.immutable\\7.0.0\\system.collections.immutable.7.0.0.nupkg.sha512"
   ],
   "logs": []
 }

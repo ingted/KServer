@@ -69,7 +69,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\fstring\PersistedConcurrentSortedList.fsproj" />
-    <ProjectReference Include="..\NTDLS.Katzebase.Client\NTDLS.Katzebase.Client.csproj" />
     <ProjectReference Include="..\NTDLS.Katzebase.Parsers.Generic\NTDLS.Katzebase.Parsers.Generic.csproj" />
     <ProjectReference Include="..\NTDLS.Katzebase.Shared\NTDLS.Katzebase.Shared.csproj" />
     <ProjectReference Include="..\protobuf-net-fsharp\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" />

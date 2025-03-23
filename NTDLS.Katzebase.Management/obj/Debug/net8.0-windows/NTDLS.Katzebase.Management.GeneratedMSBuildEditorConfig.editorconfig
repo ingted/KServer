@@ -17,4 +17,6 @@ build_property.RootNamespace = NTDLS.Katzebase.Management
 build_property.ProjectDir = G:\coldfar_py\sharftrade9\Libs5\KServer\NTDLS.Katzebase.Management\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
 build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
