@@ -6,6 +6,7 @@ open FSharp.Reflection
 open System
 open System.Reflection
 open System.IO
+open System.Collections.Concurrent
 
 module Serialiser =
     let private registerSurrogate (tp : Type) (model : RuntimeTypeModel) =
@@ -161,6 +162,9 @@ module Serialiser =
 
     let serialise (model: RuntimeTypeModel) (stream: Stream) (o: 't) = model.Serialize(stream, o)
 
+    let surrogateTypeMap = ConcurrentDictionary<Type * Type, bool>()
+
+
     let deserialise<'t> (model: RuntimeTypeModel) (stream: Stream) = 
         model.Deserialize(stream, null, typeof<'t>) :?> 't
 
@@ -179,5 +183,25 @@ module Serialiser =
 
         // 使用動態生成的類型來反序列化
         model.Deserialize(stream, null, actualType) :?> 't
+
+    let inline implicit (x:^a) : ^b = (^a: (static member op_Implicit : ^a -> ^b) x)
+
+    let inline deserialiseConcreteType2<'t, 'surrogate when 'surrogate :  (static member op_Implicit : ^surrogate -> ^t ) > (model: RuntimeTypeModel) (stream: Stream) = 
+        // 判斷 't 是否為泛型類別
+        let tType = typeof<'surrogate>
+        let actualType =
+            if tType.IsGenericType then
+                // 如果是泛型類別，則根據定義創建具體的類型
+                let genericTypeDefinition = tType.GetGenericTypeDefinition()
+                let genericArguments = tType.GetGenericArguments()
+                genericTypeDefinition.MakeGenericType(genericArguments)
+            else
+                // 如果不是泛型類別，直接返回 typeof<'t>
+                tType
+
+        // 使用動態生成的類型來反序列化
+        let s = model.Deserialize(stream, null, actualType) :?> 'surrogate
+        let o : 't = implicit s
+        o
 
     let defaultModel = RuntimeTypeModel.Default

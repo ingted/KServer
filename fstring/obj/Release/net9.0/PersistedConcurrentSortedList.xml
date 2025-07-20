@@ -218,5 +218,10 @@ persist 之後移出 buffer (不涉及寫入 base sortedList)
 persist 之後留在 buffer (不涉及寫入 base sortedList)
 </summary>
 </member>
+<member name="M:PersistedConcurrentSortedList.PCSL2.PersistedConcurrentSortedList`2.TryGetValuesNoThreadLock(System.Collections.Generic.IEnumerable{`0},System.Int32,System.Boolean,Microsoft.FSharp.Core.FSharpOption{System.Int32})">
+<summary>
+需要全資料初始化，所以就不需要後續的 buffered 了，不選擇各自 readfromfile 原因是要利用 CSL 的 GetValues API
+</summary>
+</member>
 </members>
 </doc>

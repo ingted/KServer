@@ -1,6 +1,6 @@
 ﻿namespace PersistedConcurrentSortedList
 
-
+ 
 module CSL2 =
     open System
     open System.Threading
@@ -80,33 +80,34 @@ module CSL2 =
     type Layer = int
     type Tag = string
 
-    type KVOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Key> -> Memory<'Value> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
+    type KVOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Key> -> Memory<'Value> -> int (*已知 memory 總長*) -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
 
-    and KOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Key> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
+    and KOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Key> -> int (*已知 memory 總長*) -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
 
-    and VOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Value> -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
+    and VOpFun<'Key, 'Value when 'Key : comparison> = Memory<'Value> -> int (*已知 memory 總長*) -> ResultWrapper<'Key, 'Value>[] -> Task<OpResult<'Key, 'Value>> option -> OpResult<'Key, 'Value>
 
     and Op<'Key, 'Value when 'Key : comparison> =
     | CAdd of 'Key * 'Value
     | CAdd2 of 'Key * ('Key -> 'Value)
-    | CAddKV of ('Key * 'Value) seq
+    | CAddKVs of ('Key * 'Value) seq
     | CRemove of 'Key
     | CRemoveKeys of 'Key seq
     | CRemoveKeys2 of (unit -> 'Key seq)
     | CUpdate of 'Key * 'Value
     | CUpdate2 of 'Key * ('Key -> 'Value -> 'Value)
-    | CUpdateKV of ('Key * 'Value) seq
-    | CUpdateKV2 of 'Key seq * ('Key -> 'Value -> 'Value)
+    | CUpdateKVs of ('Key * 'Value) seq
+    | CUpdateKVs2 of 'Key seq * ('Key -> 'Value -> 'Value)
     | CUpsert of 'Key * 'Value
     | CUpsert2 of 'Key * ('Key -> 'Value option -> 'Value)
-    | CUpsertKV of ('Key * 'Value) seq
-    | CUpsertKV2 of 'Key seq * ('Key -> 'Value option -> 'Value)
+    | CUpsertKVs of ('Key * 'Value) seq
+    | CUpsertKVs2 of 'Key seq * ('Key -> 'Value option -> 'Value)
     | CGet of 'Key
+    | CGetByKeys of 'Key seq
     | CContains of 'Key
     | CCount
     | CValues
     | CKeys
-    | CKV 
+    | CKVs 
     | CClean
     | IgnoreQ of Op<'Key, 'Value>
     | SeqOp of Op<'Key, 'Value> seq
@@ -115,6 +116,10 @@ module CSL2 =
     | ValuesOp of Tag option * int * int * VOpFun<'Key, 'Value>
     | KeyValuesOp of Tag option * int * int * KVOpFun<'Key, 'Value>
 
+    and KVMode =
+    | KeyOnlyMode
+    | ValueOnlyMode
+    | KVMode
     //type OpResultTyp = 
     //| TUnit         
     //| TBool         of defaultValue:bool
@@ -156,6 +161,7 @@ module CSL2 =
     | CKeyList      of IList<'Key>
     | CValueList    of IList<'Value>
     | CKVList       of ('Key * 'Value)[]
+    | CKVOptList       of ('Key * 'Value option)[]
     | FoldResult    of //(Layer * Tag option * OpResult<'Key, 'Value> option * Memory<'Value> option)[]
         ResultWrapper<'Key, 'Value>[]
         with
@@ -194,18 +200,50 @@ module CSL2 =
                 match this with
                 | CKVList valueList -> Some valueList
                 | _ -> None
+
+            member this.KVOptList =
+                match this with
+                | CKVOptList valueList -> Some valueList
+                | _ -> None
             
             member this.FoldResultRWArr =
                 match this with
                 | FoldResult rwArr -> Some rwArr
                 | _ -> None
 
+            member this.FoldResultRWArrN(n) =
+                match this with
+                | FoldResult rwArr -> rwArr[n].OpResult |> Option.map (fun wrT -> wrT.Result)
+                | _ -> None
+
+            member this.FoldResultRWArrNKey(n) = this.FoldResultRWArrN(n) |> Option.bind (fun opRst -> opRst.KeyList)
+            member this.FoldResultRWArrNValue(n) = this.FoldResultRWArrN(n) |> Option.bind (fun opRst -> opRst.ValueList)
+            member this.FoldResultRWArrNKV(n) = this.FoldResultRWArrN(n) |> Option.bind (fun opRst -> opRst.KVList)
+
+            member this.FoldResultRWArr0Key = this.FoldResultRWArrN(0).Value.KeyList
+            member this.FoldResultRWArr0Value = this.FoldResultRWArrN(0).Value.ValueList
+            member this.FoldResultRWArr0KV = this.FoldResultRWArrN(0).Value.KVList
+
     type Task<'T> with
         member this.WaitAsync(_toMilli:int) = 
+#if NET9_0
+               
+            // .NET 9 specific implementation
             this.WaitAsync(TimeSpan.FromMilliseconds _toMilli)
+#else
+            // .NET Standard 2.0 specific implementation
+               
+            Task.Run(fun () -> 
+                if this.Wait(_toMilli) then 
+                    this.Result
+                else
+                    raise (TimeoutException("Task timed out"))
+            )
+            
+#endif
         member this.Ignore () = ()
         member this.thisT = this :> Task
-        member this.WaitIgnore = this.Result |> ignore
+        member this.WaitIgnore = this.Wait()
        
 
     let rec getTypeName (t: Type) =
@@ -263,11 +301,18 @@ module CSL2 =
                         //            procCmd latestCmdToAppendOpt.Value
 
                         let rec getCmdAndProceed () =
+#if NET9_0
                             let ifD, m = messageQueue.TryDequeue () 
                             if ifD then
                                 procCmd m
+#else
+                            if messageQueue.Count > 0 then                                
+                                let m = messageQueue.Dequeue () 
+                                procCmd m
+#endif
 
                         and getCmdAndProceedBeforeLatestCmdProceed latestCmdToAppend =
+#if NET9_0
                             let ifD, m = messageQueue.TryDequeue () 
                             if ifD then
 #if DEBUG
@@ -278,6 +323,15 @@ module CSL2 =
                                 
                             else
                                 procCmd latestCmdToAppend
+#else
+                            if messageQueue.Count > 0 then
+                                let m = messageQueue.Dequeue ()
+                                printfn "Enqueue latestCmd first: %A" latestCmdToAppend
+                                messageQueue.Enqueue latestCmdToAppend
+                                procCmd m
+                            else
+                                procCmd latestCmdToAppend
+#endif
                         
                         and goAhead _status =
                             status <- _status
@@ -454,6 +508,9 @@ module CSL2 =
             opProcessor.Post (SysUnlock)
 
 
+    let ifLessThan0Then0 v = if v < 0 then 0 else v
+    let ifDiffLessThan0Then0 v minus = if v - minus < 0 then 0, v else v, minus 
+
     type ConcurrentSortedList<'Key, 'Value, 'ID
         when 'Key : comparison
         and 'Value: comparison
@@ -501,19 +558,31 @@ module CSL2 =
                 //        a
                 //    else
                 //        sortedList.TryAdd(key, value)
+#if NET9_0
                 let added = sortedList.TryAdd(key, value)
+#else
+                let added = 
+                    try
+                        sortedList.Add(key, value)
+                        true
+                    with
+                    | _ -> 
+                        false
+#endif
 
                 if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                     SortedListCache<_, _>.CacheChange sortedList
 #if DEBUG1
                 printfn "[%A] %A, %A added" slId key value
 #endif
-                rwLock.ExitWriteLock()
+                //rwLock.ExitWriteLock()
                 added
-            with
-            | _ -> 
+            //with
+            //| _ -> 
+            //    rwLock.ExitWriteLock()
+            //    reraise()
+            finally    
                 rwLock.ExitWriteLock()
-                reraise()
 
         member this.TryAddBase(kv: ('Key * 'Value) seq) =
             
@@ -533,13 +602,15 @@ module CSL2 =
 #if DEBUG1
                 printfn "[%A] %A, %A added" slId key value
 #endif
-                rwLock.ExitWriteLock()
+                //rwLock.ExitWriteLock()
                 true
-            with
-            | exn -> 
-                printfn "Error: %A" exn.Message
+            finally
                 rwLock.ExitWriteLock()
-                reraise()
+            //with
+            //| exn -> 
+            //    printfn "Error: %A" exn.Message
+            //    rwLock.ExitWriteLock()
+            //    reraise()
 
         /// 基础的 Remove 操作
         member this.TryRemoveBase(key: 'Key) =
@@ -548,12 +619,14 @@ module CSL2 =
                 let removed = sortedList.Remove(key)
                 if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                     SortedListCache<_, _>.CacheChange sortedList
-                rwLock.ExitWriteLock()
+                //rwLock.ExitWriteLock()
                 removed
-            with
-            | _ -> 
+            //with
+            //| _ -> 
+            //    rwLock.ExitWriteLock()
+            //    reraise()
+            finally
                 rwLock.ExitWriteLock()
-                reraise()
 
         member this.TryRemoveBase(keys: 'Key seq) =
             rwLock.EnterWriteLock()
@@ -568,13 +641,15 @@ module CSL2 =
                 |> Array.iter (fun k -> sortedList.Remove(k) |> ignore )
                 if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                     SortedListCache<_, _>.CacheChange sortedList
-                rwLock.ExitWriteLock()
+                //rwLock.ExitWriteLock()
                 true
-            with
-            | exn -> 
-                printfn "TryRemoveBase keys Error: %A" exn.Message
+            //with
+            //| exn -> 
+            //    printfn "TryRemoveBase keys Error: %A" exn.Message
+            //    rwLock.ExitWriteLock()
+            //    reraise()
+            finally
                 rwLock.ExitWriteLock()
-                reraise()
 
         /// 尝试更新，如果键存在则更新值
         member this.TryUpdateBase(key: 'Key, newValue: 'Value) : bool =
@@ -582,16 +657,18 @@ module CSL2 =
             try
                 if sortedList.ContainsKey(key) then
                     sortedList.[key] <- newValue
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     true
                 else
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     false
-            with
-            | exn ->
-                printfn "TryUpdateBase k v Error: %A" exn.Message
+            finally 
                 rwLock.ExitWriteLock()
-                reraise()
+            //with
+            //| exn ->
+            //    printfn "TryUpdateBase k v Error: %A" exn.Message
+            //    rwLock.ExitWriteLock()
+            //    reraise()
 
         member this.TryUpdateBase(kv: ('Key * 'Value) seq) : bool =
             rwLock.EnterWriteLock()
@@ -602,17 +679,19 @@ module CSL2 =
                             uk <- k
                             not <| sortedList.ContainsKey k) then
                     printfn "TryUpdateBase kv failed: %A not exists." uk
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     false
                 else
                     kv |> Seq.iter (fun (k, v) -> sortedList.[k] <- v)
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     true
-            with
-            | exn -> 
-                printfn "TryUpdateBase kv seq Error: %A" exn.Message
+            //with
+            //| exn -> 
+            //    printfn "TryUpdateBase kv seq Error: %A" exn.Message
+            //    rwLock.ExitWriteLock()
+            //    reraise()
+            finally
                 rwLock.ExitWriteLock()
-                reraise()
 
         member this.TryUpdateBase2(key: 'Key, newValueFactory: 'Key -> 'Value -> 'Value) : bool =
             rwLock.EnterWriteLock()
@@ -620,16 +699,18 @@ module CSL2 =
                 match sortedList.TryGetValue key with
                 | true, v ->
                     sortedList.[key] <- newValueFactory key v
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     true
                 | false, _ ->
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()rwLock.ExitWriteLock()
                     false
-            with
-            | exn -> 
-                printfn "TryUpdateBase2 k f Error: %A" exn.Message
+            finally
                 rwLock.ExitWriteLock()
-                reraise()
+            //with
+            //| exn -> 
+            //    printfn "TryUpdateBase2 k f Error: %A" exn.Message
+            //    rwLock.ExitWriteLock()
+            //    reraise()
 
         member this.TryUpdateBase2(keys: 'Key seq, newValueFactory: 'Key -> 'Value -> 'Value) : bool =
             rwLock.EnterWriteLock()
@@ -640,7 +721,7 @@ module CSL2 =
                             uk <- k
                             not <| sortedList.ContainsKey k) then
                     printfn "TryUpdateBase2 kv failed: %A not exists." uk
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     false
                 else
                     keys 
@@ -648,35 +729,45 @@ module CSL2 =
                         let v = sortedList.[k]
                         sortedList.[k] <- newValueFactory k v
                         )
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     true
-            with
-            | exn -> 
-                printfn "TryUpdateBase2 k seq f Error: %A" exn.Message
+            finally
                 rwLock.ExitWriteLock()
-                reraise()
 
         member this.TryUpsertBase(key: 'Key, newValue: 'Value) =
             rwLock.EnterWriteLock()
             try
                 if sortedList.ContainsKey(key) then
                     sortedList.[key] <- newValue
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     2
                 else
+#if NET9_0
                     if sortedList.TryAdd (key, newValue) then
                         if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                             SortedListCache<_, _>.CacheChange sortedList
-                        rwLock.ExitWriteLock()
                         1
                     else
-                        rwLock.ExitWriteLock()
                         0
-            with
-            | exn -> 
-                printfn "TryUpsertBase k v Error: %A" exn.Message
+#else
+                    try
+                        sortedList.Add(key, newValue)
+                    
+                        if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
+                            SortedListCache<_, _>.CacheChange sortedList
+                        1
+                    with
+                    | _ ->
+                        0
+#endif
+                
+            //with
+            //| exn -> 
+            //    printfn "TryUpsertBase k v Error: %A" exn.Message
+            //    rwLock.ExitWriteLock()
+            //    reraise()
+            finally
                 rwLock.ExitWriteLock()
-                reraise()
 
         member this.TryUpsertBase(kv: ('Key * 'Value) seq) =
             rwLock.EnterWriteLock()
@@ -689,13 +780,15 @@ module CSL2 =
                 )
                 if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                     SortedListCache<_, _>.CacheChange sortedList
-                rwLock.ExitWriteLock()
+                //rwLock.ExitWriteLock()
                 true
-            with
-            | exn -> 
-                printfn "TryUpsertBase kv seq Error: %A" exn.Message
+            finally 
                 rwLock.ExitWriteLock()
-                reraise()
+            //with
+            //| exn -> 
+            //    printfn "TryUpsertBase kv seq Error: %A" exn.Message
+            //    rwLock.ExitWriteLock()
+            //    reraise()
 
         member this.TryUpsertBase2(key: 'Key, newValueFactory: 'Key -> 'Value option -> 'Value) =
             rwLock.EnterWriteLock()
@@ -703,42 +796,80 @@ module CSL2 =
                 match sortedList.TryGetValue key with
                 | true, v ->
                     sortedList.[key] <- newValueFactory key (Some v)
-                    rwLock.ExitWriteLock()
+                    //rwLock.ExitWriteLock()
                     2
                 | _ ->
+#if NET9_0
                     if sortedList.TryAdd (key, newValueFactory key None) then
+                        if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
+                            SortedListCache<_, _>.CacheChange sortedList
+                        //rwLock.ExitWriteLock()
+                        1
+                    else
+                        //rwLock.ExitWriteLock()
+                        0
+#else
+
+                    try 
+                        sortedList.Add (key, newValueFactory key None)
                         if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
                             SortedListCache<_, _>.CacheChange sortedList
                         rwLock.ExitWriteLock()
                         1
-                    else
+                    with
+                    | _ ->
                         rwLock.ExitWriteLock()
                         0
-            with
-            | exn -> 
-                printfn "TryUpsertBase2 k f Error: %A" exn.Message
+#endif
+            finally
                 rwLock.ExitWriteLock()
-                reraise()
 
         member this.TryUpsertBase2(keys: 'Key seq, newValueFactory: 'Key -> 'Value option -> 'Value) =
             rwLock.EnterWriteLock()
             try
-                keys |> Seq.iter (fun key ->
-                    match sortedList.TryGetValue key with
-                    | true, v ->
-                        sortedList.[key] <- newValueFactory key (Some v)
-                    | false, _ ->
-                        sortedList.Add(key, newValueFactory key None) |> ignore
-                )
-                if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
-                    SortedListCache<_, _>.CacheChange sortedList
+                try
+                    keys |> Seq.iter (fun key ->
+                        match sortedList.TryGetValue key with
+                        | true, v ->
+                            sortedList.[key] <- newValueFactory key (Some v)
+                        | false, _ ->
+                            sortedList.Add(key, newValueFactory key None) |> ignore
+                    )
+                    if this.autoCacheChange.IsSome && this.autoCacheChange.Value <> 0 then
+                        SortedListCache<_, _>.CacheChange sortedList
+                    //rwLock.ExitWriteLock()
+                    true
+                with
+                | exn -> 
+                    printfn "TryUpsertBase2 keys f Error: %A" exn.Message
+                    //rwLock.ExitWriteLock()
+                    false
+            finally
                 rwLock.ExitWriteLock()
-                true
-            with
-            | exn -> 
-                printfn "TryUpsertBase2 keys f Error: %A" exn.Message
-                rwLock.ExitWriteLock()
-                false
+
+        member this.TryGetValuesBase(keys: 'Key seq) =
+            rwLock.EnterReadLock()
+            try
+                let rst =
+                    keys
+                    |> Seq.map (fun key ->                    
+                        match sortedList.TryGetValue key with
+                        | true, v -> 
+                            key, Some v
+                        | _ -> 
+                            //this.mreReadOpt.Value.Set ()
+                            key, None
+                    )
+                    |> Seq.toArray
+                //rwLock.ExitReadLock()
+                rst
+            //with
+            //| exn ->
+            //    printfn "TryGetValueBase k Error: %A" exn.Message
+            //    rwLock.ExitReadLock()
+            //    reraise()
+            finally
+                rwLock.ExitReadLock()
 
         member this.TryGetValueBase(key: 'Key) : bool * 'Value option =
             //if this.mreReadOpt.IsSome then
@@ -749,17 +880,19 @@ module CSL2 =
                 match sortedList.TryGetValue key with
                 | true, v -> 
                     //this.mreReadOpt.Value.Set ()
-                    rwLock.ExitReadLock()
+                    //rwLock.ExitReadLock()
                     true, Some v
                 | _ -> 
                     //this.mreReadOpt.Value.Set ()
-                    rwLock.ExitReadLock()
+                    //rwLock.ExitReadLock()
                     false, None
-            with
-            | exn ->
-                printfn "TryGetValueBase k Error: %A" exn.Message
+            //with
+            //| exn ->
+            //    printfn "TryGetValueBase k Error: %A" exn.Message
+            //    //rwLock.ExitReadLock()
+            //    reraise()
+            finally
                 rwLock.ExitReadLock()
-                reraise()
 
         member this.TryGetValueBaseOpt(keys: 'Key seq) : ('Key * 'Value option) seq =
             rwLock.EnterReadLock()
@@ -774,13 +907,15 @@ module CSL2 =
                         | _ -> 
                             key, None
                     )
-                rwLock.ExitReadLock()
+                //rwLock.ExitReadLock()
                 results
-            with
-            | exn ->
-                printfn "TryGetValueBaseOpt keys kvOpt seq Error: %A" exn.Message
+            //with
+            //| exn ->
+            //    printfn "TryGetValueBaseOpt keys kvOpt seq Error: %A" exn.Message
+            //    rwLock.ExitReadLock()
+            //    reraise()
+            finally
                 rwLock.ExitReadLock()
-                reraise()
 
         member this.TryGetValueBase(keys: 'Key seq) : ('Key * 'Value) seq =
             rwLock.EnterReadLock()
@@ -795,13 +930,15 @@ module CSL2 =
                         | _ -> 
                             None
                     )
-                rwLock.ExitReadLock()
+                //rwLock.ExitReadLock()
                 results
-            with
-            | exn ->
-                printfn "TryGetValueBase keys kv seq Error: %A" exn.Message
+            //with
+            //| exn ->
+            //    printfn "TryGetValueBase keys kv seq Error: %A" exn.Message
+            //    rwLock.ExitReadLock()
+            //    reraise()
+            finally
                 rwLock.ExitReadLock()
-                reraise()
 
         /// 封装操作并添加到任务队列，执行后返回 Task
         member this.LockableOps (_op: Op<'Key, 'Value>, lockIdOpt: Guid option) =
@@ -809,29 +946,72 @@ module CSL2 =
             let rec processOp layer arr (preResultTask: Task<OpResult<_,_>> option) (op: Op<'Key, 'Value>) (baseInstance: ConcurrentSortedList<'Key, 'Value, 'ID>) =
                 let results =
                     match op with
-                    | KeysOp (tagOpt, start, length, f) ->
+                    | KeysOp (tagOpt, start_, length_, f) ->
                         let kc = SortedListCache<'Key, 'Value>.GetKeysCached(baseInstance._base)
-                        let keysMemory = kc |> createMemoryFromArr<'Key> start length
-                        let curResult = task {return f keysMemory arr preResultTask}
+                        let start, length = 
+                            let s = if start_ < 0 then kc.Length + start_ else start_
+                            if length_ >= 0 then
+                                s, length_
+                            else
+                                ifDiffLessThan0Then0 s -length_
+                        let keysMemory, memLength = 
+                            if length = 0 then
+                                let l = kc.Length - start
+                                (kc |> createMemoryFromArr<'Key> start l), l
+                            else 
+                                (kc |> createMemoryFromArr<'Key> start length), length
+
+                                
+                        let curResult = task {return f keysMemory memLength arr preResultTask}
                         if tagOpt.IsSome then
                             ResultWrapper(layer, tagOpt.Value, kMemory=keysMemory, opResult = curResult), curResult
                         else
                             ResultWrapper(layer, opResult = curResult), curResult
 
-                    | ValuesOp (tagOpt, start, length, f) ->
+                    | ValuesOp (tagOpt, start_, length_, f) ->
                         // 從緩存中取得 values 並創建 Memory
-                        let valuesMemory = SortedListCache<'Key, 'Value>.GetValuesCached(baseInstance._base) |> createMemoryFromArr<'Value> start length
-                        let curResult = task {return f valuesMemory arr preResultTask}
+                        let vc = SortedListCache<'Key, 'Value>.GetValuesCached(baseInstance._base)
+                        let start, length = 
+                            let s = if start_ < 0 then vc.Length + start_ else start_
+                            if length_ >= 0 then
+                                s, length_
+                            else
+                                ifDiffLessThan0Then0 s -length_
+                        let valuesMemory, memLength = 
+                            if length = 0 then
+                                let l = vc.Length - start
+                                (vc |> createMemoryFromArr<'Value> start l), l
+                            else
+                                (vc |> createMemoryFromArr<'Value> start length), length
+                        let curResult = task {return f valuesMemory memLength arr preResultTask}
                         if tagOpt.IsSome then
                             ResultWrapper(layer, tagOpt.Value, vMemory = valuesMemory, opResult = curResult), curResult
                         else
                             ResultWrapper(layer, vMemory = valuesMemory, opResult = curResult), curResult
 
-                    | KeyValuesOp (tagOpt, start, length, f) ->
+                    ///start 給定負數可從陣列尾端往前幾個開始往後抓 length 個 或往前抓 -length 個(length 為負表往前，超過則從0開始抓)
+                    ///如果 start 負數絕對值超過長度，則會錯，不會從0開始抓
+                    | KeyValuesOp (tagOpt, start_, length_, f) ->
                         // 從緩存中取得 keys 和 values 並創建 Memory
-                        let keysMemory = SortedListCache<'Key, 'Value>.GetKeysCached(baseInstance._base) |> createMemoryFromArr<'Key> start length
-                        let valuesMemory = SortedListCache<'Key, 'Value>.GetValuesCached(baseInstance._base) |> createMemoryFromArr<'Value> start length
-                        let curResult = task {return f keysMemory valuesMemory arr preResultTask}
+                        let kc = SortedListCache<'Key, 'Value>.GetKeysCached(baseInstance._base)
+                        let vc = SortedListCache<'Key, 'Value>.GetValuesCached(baseInstance._base)
+                        let start, length = 
+                            let s = if start_ < 0 then kc.Length + start_ else start_
+                            if length_ >= 0 then
+                                s, length_
+                            else
+                                ifDiffLessThan0Then0 s -length_
+                        let keysMemory, valuesMemory, memLength = 
+                            if length = 0 then
+                                let l = kc.Length - start
+                                let keysMemory = kc |> createMemoryFromArr<'Key> start l
+                                let valuesMemory = vc |> createMemoryFromArr<'Value> start l
+                                keysMemory, valuesMemory, l
+                            else
+                                let keysMemory = kc |> createMemoryFromArr<'Key> start length
+                                let valuesMemory = vc |> createMemoryFromArr<'Value> start length
+                                keysMemory, valuesMemory, length 
+                        let curResult = task {return f keysMemory valuesMemory memLength arr preResultTask}
                         if tagOpt.IsSome then
                             ResultWrapper(layer, tagOpt.Value, kMemory = keysMemory, vMemory = valuesMemory, opResult = curResult), curResult
                         else
@@ -884,7 +1064,7 @@ module CSL2 =
                     | CAdd (k, v) ->
                         fun () ->
                             this.TryAddBase(k, v) |> CBool
-                    | CAddKV kvs ->
+                    | CAddKVs kvs ->
                         fun () ->
                             this.TryAddBase kvs |> CBool
                     | CAdd2 (k, f) ->
@@ -904,7 +1084,7 @@ module CSL2 =
                     | CUpdate (k, v) ->
                         fun () ->
                             this.TryUpdateBase(k, v) |> CBool
-                    | CUpdateKV (kvs) ->
+                    | CUpdateKVs (kvs) ->
                         fun () ->
                             this.TryUpdateBase(kvs) |> CBool
 
@@ -912,7 +1092,7 @@ module CSL2 =
                         fun () ->
                             this.TryUpdateBase2(k, f) |> CBool
                             
-                    | CUpdateKV2 (ks, f) ->
+                    | CUpdateKVs2 (ks, f) ->
                         fun () ->
                             this.TryUpdateBase2(ks, f) |> CBool
                             
@@ -921,16 +1101,19 @@ module CSL2 =
                         fun () ->
                             this.TryUpsertBase(k, v) |> CInt
                             
-                    | CUpsertKV (kvs) ->
+                    | CUpsertKVs (kvs) ->
                         fun () ->
                             this.TryUpsertBase(kvs) |> CBool
                     | CUpsert2 (k, f) ->
                         fun () ->
                             this.TryUpsertBase2(k, f) |> CInt
-                    | CUpsertKV2 (ks, f) ->
+                    | CUpsertKVs2 (ks, f) ->
                         fun () ->
-                            this.TryUpsertBase2(ks, f) |> CInt
-
+                            this.TryUpsertBase2(ks, f) |> CBool
+                    | CGetByKeys ks ->
+                        fun () ->
+                            this.TryGetValuesBase(ks) |> CKVOptList
+                        
                     | CGet k ->
                         fun () ->
                             this.TryGetValueBase(k) |> COptionValue
@@ -943,7 +1126,7 @@ module CSL2 =
                     | CKeys ->
                         fun () -> 
                             sortedList.Keys |> CKeyList
-                    | CKV ->
+                    | CKVs ->
                         fun () -> 
                             sortedList |> Seq.map (fun kvp -> kvp.Key, kvp.Value) |> Seq.toArray |> CKVList
                     | CClean ->
@@ -1021,9 +1204,9 @@ module CSL2 =
 
         member this.Add(kvs, ifIgnoreQ) =
             if ifIgnoreQ then
-                this.LockableOp(IgnoreQ (CAddKV kvs))
+                this.LockableOp(IgnoreQ (CAddKVs kvs))
             else
-                this.LockableOp(CAddKV kvs)
+                this.LockableOp(CAddKVs kvs)
 
         member this.Add(kvs) =
             this.Add(kvs, false)
@@ -1078,11 +1261,24 @@ module CSL2 =
         member this.GetValue(key: 'Key) =
             this.GetValue(key, false)
 
+        member this.GetValues(keys: 'Key seq, ifIgnoreQ) =
+            if ifIgnoreQ then
+                this.LockableOp(IgnoreQ (CGetByKeys keys))
+            else
+                this.LockableOp(CGetByKeys keys)
+
+        member this.GetValues(keys: 'Key seq) =
+            this.GetValues(keys, false)
+
         member this.GetValueSafe(key: 'Key) : bool * 'Value option =
 #if DEBUG1
             printfn "TryGetValueSafe"
 #endif
             let (COptionValue r) = this.GetValue(key).Result
+            r
+
+        member this.GetValuesSafe(keys: 'Key seq) =
+            let (CKVOptList r) = this.GetValues(keys).Result
             r
 
         member this.TryGetValueSafeTo(key: 'Key, _toMilli:int) : bool * 'Value option =
@@ -1095,6 +1291,14 @@ module CSL2 =
             with
             | :? System.TimeoutException as te ->
                 false, None
+
+        member this.TryGetValuesSafeTo(keys: 'Key seq, _toMilli:int) =
+            try
+                let (CKVOptList r) = this.GetValues(keys).WaitAsync(_toMilli).Result
+                r
+            with
+            | :? System.TimeoutException as te ->
+                [||]
 
         /// 访问 Item：带线程锁的读写访问
         member this.Item
@@ -1166,6 +1370,51 @@ module CSL2 =
         member this.ContainsKeySafe (k:'Key) =
             let (CBool r) = this.ContainsKey(k).Result
             r
+
+        member this.FirstLastN(n, kvMode: KVMode, _toMilliOpt: int option) = 
+            // Ensure cache is updated if autoCache is not true
+            if this.autoCacheChange.IsNone || this.autoCacheChange.Value = 0 then
+                SortedListCache<_, _>.CacheChange(sortedList)
+
+            let _n = if n > 0 then 0 else n
+            let kvOp = 
+                match kvMode with
+                | KeyOnlyMode ->
+                    KeysOp(None, _n, abs n, fun keysMemory memLen _ _ ->
+                        let keys = keysMemory.Span.ToArray()
+                        CKeyList keys
+                    )
+                | ValueOnlyMode ->
+                    ValuesOp(None, _n, abs n, fun valuesMemory memLen _ _ ->
+                        let values = valuesMemory.Span.ToArray()
+                        CValueList values
+                    )
+                | KVMode ->
+                    KeyValuesOp(None, _n, abs n, fun keysMemory valuesMemory memLen _ _ ->
+                        let keys = keysMemory.Span.ToArray()
+                        let values = valuesMemory.Span.ToArray()
+                        CKVList ((keys, values) ||> Array.map2 (fun k v -> k,v))
+                    )
+            if _toMilliOpt.IsNone then
+                this.LockableOp(kvOp).Result
+            else
+                this.LockableOp(kvOp).WaitAsync(_toMilliOpt.Value).Result
+
+        member this.FirstLastN(n, kvMode) =
+            this.FirstLastN(n, kvMode, None)
+
+        member this.FirstLastNKeys(n) =
+            defaultArg (this.FirstLastN(n, KeyOnlyMode, None).FoldResultRWArr0Key) [||]
+
+        member this.FirstLastNValues(n) =
+            defaultArg (this.FirstLastN(n, ValueOnlyMode, None).FoldResultRWArr0Value) [||]
+
+        member this.FirstLastN(n) =
+            defaultArg (this.FirstLastN(n, KVMode, None).FoldResultRWArr0KV) [||]
+
+
+
+
 
         member this._base = sortedList
 
