@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Configurations>Debug;Release;DebugWithNoDep</Configurations>
+    <Configurations>Debug;Release;DbgWithNoDep</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ProtoBuf.FSharp\ProtoBuf.FSharp.fsproj" />
